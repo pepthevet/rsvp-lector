@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RSVP Lector">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a0a0a">
+<title>RSVP Lector</title>
+<style>
+  :root {
+    --bg:        #0a0a0a;
+    --surface:   #141414;
+    --border:    #2a2a2a;
+    --accent:    #e8ff47;
+    --accent-dk: #b8cc1a;
+    --red:       #ff4545;
+    --text:      #f0f0f0;
+    --muted:     #666;
+    --box-bg:    #ffffff;
+    --box-text:  #111111;
+    --box-red:   #cc1a1a;
+    --r:         12px;
+    --safe-top:  env(safe-area-inset-top, 0px);
+    --safe-bot:  env(safe-area-inset-bottom, 0px);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior: none;
+    user-select: none;
+  }
+
+  /* ── SCREENS ─────────────────────────────────────────── */
+  .screen {
+    display: none;
+    flex-direction: column;
+    height: 100%;
+    padding-top: var(--safe-top);
+    padding-bottom: var(--safe-bot);
+  }
+  .screen.active { display: flex; }
+
+  /* ── LOAD SCREEN ─────────────────────────────────────── */
+  #screen-load {
+    padding: 24px 20px;
+    gap: 16px;
+    overflow-y: auto;
+  }
+  .load-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 8px;
+  }
+  .app-title {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--accent);
+  }
+  .app-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .speed-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 6px 14px;
+  }
+  .speed-pill span { font-size: 13px; color: var(--muted); }
+  .speed-pill strong { font-size: 15px; font-weight: 600; color: var(--accent); }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  /* Paste area */
+  .paste-area {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 14px;
+    min-height: 130px;
+    font-size: 16px;
+    color: var(--text);
+    line-height: 1.5;
+    outline: none;
+    resize: none;
+    width: 100%;
+    font-family: inherit;
+    -webkit-user-select: text;
+    user-select: text;
+  }
+  .paste-area:focus { border-color: var(--accent); }
+  .paste-area::placeholder { color: var(--muted); }
+
+  /* Action buttons row */
+  .action-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .btn-action {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 14px 12px;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .btn-action:active { background: #222; }
+  .btn-action .icon { font-size: 24px; }
+  .btn-action .lbl { color: var(--muted); font-size: 12px; font-weight: 400; }
+
+  /* Speed slider */
+  .slider-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 16px;
+  }
+  .slider-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 12px;
+  }
+  .slider-top .val {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -1px;
+  }
+  .slider-top .unit { font-size: 14px; color: var(--muted); }
+  .slider-top .lvl  { font-size: 13px; color: var(--muted); }
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+  }
+
+  /* Start button */
+  .btn-start {
+    background: var(--accent);
+    color: #111;
+    border: none;
+    border-radius: var(--r);
+    padding: 18px;
+    font-size: 17px;
+    font-weight: 700;
+    width: 100%;
+    cursor: pointer;
+    letter-spacing: -0.3px;
+    transition: background 0.15s;
+  }
+  .btn-start:active { background: var(--accent-dk); }
+  .btn-start:disabled { background: var(--border); color: var(--muted); }
+
+  /* word count chip */
+  .word-chip {
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+    min-height: 18px;
+  }
+  .word-chip.ready { color: var(--accent); }
+
+  /* ── READER SCREEN ───────────────────────────────────── */
+  #screen-reader {
+    justify-content: space-between;
+    padding: 0;
+  }
+
+  .reader-top {
+    padding: calc(var(--safe-top) + 16px) 20px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .btn-back {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 4px 0;
+  }
+  .reader-stat {
+    font-size: 13px;
+    color: var(--muted);
+    text-align: right;
+  }
+  .reader-stat strong { color: var(--text); }
+
+  /* Progress bar */
+  .progress-track {
+    height: 2px;
+    background: var(--border);
+    margin: 0 20px;
+    border-radius: 1px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 1px;
+    transition: width 0.1s linear;
+    width: 0%;
+  }
+
+  /* White word box */
+  .word-stage {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .word-box {
+    background: var(--box-bg);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 360px;
+    aspect-ratio: 16/7;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.08);
+  }
+  .orp-marker-top {
+    position: absolute;
+    top: 14px;
+    font-size: 10px;
+    color: #bbb;
+    pointer-events: none;
+  }
+  .orp-marker-bot {
+    position: absolute;
+    bottom: 14px;
+    font-size: 10px;
+    color: #bbb;
+    pointer-events: none;
+  }
+  .word-display {
+    font-size: clamp(28px, 7vw, 40px);
+    font-weight: 700;
+    color: var(--box-text);
+    letter-spacing: -0.5px;
+    line-height: 1;
+    display: flex;
+    align-items: baseline;
+  }
+  .word-before { color: var(--box-text); }
+  .word-pivot  { color: var(--box-red); }
+  .word-after  { color: var(--box-text); }
+  .word-idle   { font-size: 16px; color: #aaa; font-weight: 400; }
+
+  /* Controls */
+  .reader-controls {
+    padding: 0 20px calc(var(--safe-bot) + 24px);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .speed-row-reader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .btn-speed {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.1s;
+  }
+  .btn-speed:active { background: #222; }
+  .speed-mini {
+    flex: 1;
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .speed-mini strong { color: var(--accent); font-size: 17px; }
+
+  .main-controls {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 10px;
+  }
+  .btn-ctrl {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 14px 8px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: background 0.1s;
+  }
+  .btn-ctrl:active { background: #222; }
+  .btn-ctrl .ci { font-size: 22px; }
+  .btn-play-main {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #111;
+  }
+  .btn-play-main:active { background: var(--accent-dk); }
+
+  /* ── DONE SCREEN ─────────────────────────────────────── */
+  #screen-done {
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 32px 24px;
+  }
+  .done-icon { font-size: 56px; }
+  .done-title { font-size: 26px; font-weight: 700; color: var(--accent); letter-spacing: -0.5px; }
+  .done-stats {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    width: 100%;
+    overflow: hidden;
+  }
+  .done-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 14px 16px;
+    font-size: 15px;
+    border-bottom: 1px solid var(--border);
+  }
+  .done-row:last-child { border-bottom: none; }
+  .done-row span { color: var(--muted); }
+  .done-row strong { color: var(--text); }
+  .btn-again {
+    background: var(--accent);
+    color: #111;
+    border: none;
+    border-radius: var(--r);
+    padding: 16px 32px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  /* Hidden file input */
+  #file-input { display: none; }
+</style>
+</head>
+<body>
+
+<!-- ── LOAD SCREEN ─────────────────────────────────────── -->
+<div id="screen-load" class="screen active">
+  <div class="load-header">
+    <div>
+      <div class="app-title">RSVP Lector</div>
+      <div class="app-sub">Entrena tu lectura rápida</div>
+    </div>
+  </div>
+
+  <div>
+    <div class="section-label">Pega tu texto</div>
+    <textarea id="paste-input" class="paste-area" placeholder="Pega aquí cualquier texto…" rows="5"></textarea>
+    <div class="word-chip" id="word-chip"></div>
+  </div>
+
+  <div>
+    <div class="section-label">O elige cómo cargar</div>
+    <div class="action-row">
+      <button class="btn-action" onclick="openFile()">
+        <span class="icon">📄</span>
+        <span>Fichero .txt</span>
+        <span class="lbl">desde Archivos</span>
+      </button>
+      <button class="btn-action" onclick="openShareTarget()">
+        <span class="icon">🔗</span>
+        <span>Texto demo</span>
+        <span class="lbl">probar la app</span>
+      </button>
+    </div>
+    <input type="file" id="file-input" accept=".txt,text/plain" onchange="loadFile(event)">
+  </div>
+
+  <div>
+    <div class="section-label">Velocidad</div>
+    <div class="slider-wrap">
+      <div class="slider-top">
+        <div><span class="val" id="speed-val">250</span> <span class="unit">ppm</span></div>
+        <div class="lvl" id="speed-lvl">Promedio</div>
+      </div>
+      <input type="range" id="speed-slider" min="100" max="700" step="50" value="250"
+             oninput="updateSpeedUI(this.value)">
+    </div>
+  </div>
+
+  <button class="btn-start" id="btn-start" onclick="startReader()" disabled>
+    Iniciar lectura
+  </button>
+</div>
+
+<!-- ── READER SCREEN ────────────────────────────────────── -->
+<div id="screen-reader" class="screen">
+  <div class="reader-top">
+    <button class="btn-back" onclick="goBack()">← Volver</button>
+    <div class="reader-stat">
+      <strong id="r-idx">0</strong> / <span id="r-total">0</span>
+      &nbsp;·&nbsp; <strong id="r-pct">0</strong>%
+    </div>
+  </div>
+
+  <div class="progress-track">
+    <div class="progress-fill" id="r-progress"></div>
+  </div>
+
+  <div class="word-stage">
+    <div class="word-box" id="word-box">
+      <div class="orp-marker-top" id="orp-top">▼</div>
+      <div class="word-display" id="word-display">
+        <span class="word-idle">Pulsa ▶ para empezar</span>
+      </div>
+      <div class="orp-marker-bot" id="orp-bot">▲</div>
+    </div>
+  </div>
+
+  <div class="reader-controls">
+    <div class="speed-row-reader">
+      <button class="btn-speed" onclick="changeSpeed(-50)">−</button>
+      <div class="speed-mini"><strong id="r-ppm">250</strong> ppm · <span id="r-lvl">Promedio</span></div>
+      <button class="btn-speed" onclick="changeSpeed(+50)">+</button>
+    </div>
+    <div class="main-controls">
+      <button class="btn-ctrl" onclick="restartReader()">
+        <span class="ci">↺</span>
+        <span>Reiniciar</span>
+      </button>
+      <button class="btn-ctrl btn-play-main" id="btn-play" onclick="togglePlay()">
+        <span class="ci" id="play-icon">▶</span>
+        <span id="play-label">Iniciar</span>
+      </button>
+      <button class="btn-ctrl" onclick="goBack()">
+        <span class="ci">✕</span>
+        <span>Salir</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── DONE SCREEN ──────────────────────────────────────── -->
+<div id="screen-done" class="screen">
+  <div class="done-icon">✓</div>
+  <div class="done-title">¡Texto completado!</div>
+  <div class="done-stats">
+    <div class="done-row"><span>Palabras leídas</span><strong id="d-words">—</strong></div>
+    <div class="done-row"><span>Velocidad</span><strong id="d-ppm">—</strong></div>
+    <div class="done-row"><span>Tiempo</span><strong id="d-time">—</strong></div>
+    <div class="done-row"><span>Nivel</span><strong id="d-lvl">—</strong></div>
+  </div>
+  <button class="btn-again" onclick="showLoad()">Leer otro texto</button>
+</div>
+
+<script>
+const DEMO = "El cerebro humano contiene aproximadamente cien mil millones de neuronas interconectadas entre sí. Cada neurona puede establecer miles de conexiones sinápticas con otras células nerviosas. Esta red neuronal es la base de todo pensamiento, memoria y emoción que experimentamos a lo largo de nuestra vida. Los científicos estiman que el número total de conexiones posibles supera al de átomos en el universo observable. La plasticidad cerebral nos permite aprender nuevas habilidades y modificar hábitos incluso en la edad adulta, lo que significa que la lectura rápida es una destreza perfectamente alcanzable con práctica constante y técnica adecuada. Cada vez que practicas RSVP estás entrenando a tus ojos a fijarse menos veces por línea y a tu mente a procesar grupos de palabras sin necesidad de subvocalizar. Con sesiones diarias de diez minutos verás resultados en pocas semanas.";
+
+let words = [];
+let idx = 0;
+let ppm = 250;
+let playing = false;
+let timer = null;
+let startTime = null;
+
+// ── Helpers ────────────────────────────────────────────
+function levelLabel(p) {
+  if (p < 200) return "Lento";
+  if (p < 300) return "Promedio";
+  if (p < 450) return "Ágil";
+  if (p < 600) return "Avanzado";
+  return "Experto";
+}
+
+function getORP(word) {
+  const clean = word.replace(/[^a-záéíóúüñA-ZÁÉÍÓÚÜÑ]/g, "");
+  const l = clean.length;
+  if (l <= 1) return 0;
+  if (l <= 5) return 1;
+  return Math.floor(l * 0.35);
+}
+
+function tokenize(text) {
+  return text.trim().split(/\s+/).filter(Boolean);
+}
+
+function formatTime(sec) {
+  if (sec < 60) return sec + "s";
+  return Math.floor(sec / 60) + "m " + (sec % 60) + "s";
+}
+
+// ── Speed UI ───────────────────────────────────────────
+function updateSpeedUI(val) {
+  ppm = parseInt(val);
+  document.getElementById("speed-val").textContent = ppm;
+  document.getElementById("speed-lvl").textContent = levelLabel(ppm);
+  document.getElementById("r-ppm").textContent = ppm;
+  document.getElementById("r-lvl").textContent = levelLabel(ppm);
+  document.getElementById("speed-slider").value = ppm;
+}
+
+function changeSpeed(delta) {
+  updateSpeedUI(Math.min(1000, Math.max(50, ppm + delta)));
+  if (playing) { clearInterval(timer); startTimer(); }
+}
+
+// ── Text loading ───────────────────────────────────────
+const pasteInput = document.getElementById("paste-input");
+pasteInput.addEventListener("input", () => {
+  const w = tokenize(pasteInput.value);
+  const chip = document.getElementById("word-chip");
+  const btn  = document.getElementById("btn-start");
+  if (w.length > 0) {
+    chip.textContent = w.length + " palabras detectadas";
+    chip.className = "word-chip ready";
+    btn.disabled = false;
+  } else {
+    chip.textContent = "";
+    chip.className = "word-chip";
+    btn.disabled = true;
+  }
+});
+
+function openFile() {
+  document.getElementById("file-input").click();
+}
+
+function loadFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    pasteInput.value = ev.target.result;
+    pasteInput.dispatchEvent(new Event("input"));
+  };
+  reader.readAsText(file, "utf-8");
+}
+
+function openShareTarget() {
+  pasteInput.value = DEMO;
+  pasteInput.dispatchEvent(new Event("input"));
+}
+
+// ── Screen nav ─────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+function showLoad() { stopPlay(); showScreen("screen-load"); }
+function goBack()   { stopPlay(); showScreen("screen-load"); }
+
+// ── Reader ─────────────────────────────────────────────
+function startReader() {
+  words = tokenize(pasteInput.value);
+  if (!words.length) return;
+  idx = 0;
+  startTime = Date.now();
+  showScreen("screen-reader");
+  updateReaderStats();
+  renderWord();
+}
+
+function renderWord() {
+  const display = document.getElementById("word-display");
+  const orpTop  = document.getElementById("orp-top");
+  const orpBot  = document.getElementById("orp-bot");
+
+  if (idx >= words.length) {
+    display.innerHTML = '<span class="word-idle">✓ Fin</span>';
+    orpTop.style.opacity = "0";
+    orpBot.style.opacity = "0";
+    return;
+  }
+
+  const word   = words[idx];
+  const orp    = getORP(word);
+  const before = word.slice(0, orp);
+  const pivot  = word.slice(orp, orp + 1);
+  const after  = word.slice(orp + 1);
+
+  display.innerHTML =
+    `<span class="word-before">${before}</span>` +
+    `<span class="word-pivot">${pivot}</span>` +
+    `<span class="word-after">${after}</span>`;
+
+  // Position ORP markers horizontally
+  const boxW    = document.getElementById("word-box").offsetWidth;
+  const charW   = 24; // approx px per char at current font
+  const wordPx  = word.length * charW;
+  const startPx = (boxW - wordPx) / 2;
+  const pivotPx = startPx + orp * charW + charW / 2;
+  const leftPct = Math.round(pivotPx / boxW * 100);
+  orpTop.style.left = leftPct + "%";
+  orpTop.style.transform = "translateX(-50%)";
+  orpBot.style.left = leftPct + "%";
+  orpBot.style.transform = "translateX(-50%)";
+  orpTop.style.opacity = "1";
+  orpBot.style.opacity = "1";
+
+  updateReaderStats();
+}
+
+function updateReaderStats() {
+  const total = words.length;
+  const pct   = total ? Math.round(idx / total * 100) : 0;
+  document.getElementById("r-idx").textContent      = idx;
+  document.getElementById("r-total").textContent    = total;
+  document.getElementById("r-pct").textContent      = pct;
+  document.getElementById("r-progress").style.width = pct + "%";
+}
+
+function startTimer() {
+  const delay = Math.round(60000 / ppm);
+  timer = setInterval(() => {
+    if (idx >= words.length) { stopPlay(); showDone(); return; }
+    idx++;
+    renderWord();
+  }, delay);
+}
+
+function togglePlay() {
+  if (playing) { stopPlay(); } else { play(); }
+}
+
+function play() {
+  if (idx >= words.length) { idx = 0; renderWord(); }
+  playing = true;
+  document.getElementById("play-icon").textContent  = "⏸";
+  document.getElementById("play-label").textContent = "Pausar";
+  startTimer();
+}
+
+function stopPlay() {
+  playing = false;
+  clearInterval(timer);
+  timer = null;
+  const icon  = document.getElementById("play-icon");
+  const label = document.getElementById("play-label");
+  if (icon)  icon.textContent  = "▶";
+  if (label) label.textContent = "Continuar";
+}
+
+function restartReader() {
+  stopPlay();
+  idx = 0;
+  startTime = Date.now();
+  renderWord();
+  updateReaderStats();
+  document.getElementById("play-icon").textContent  = "▶";
+  document.getElementById("play-label").textContent = "Iniciar";
+}
+
+// ── Done ───────────────────────────────────────────────
+function showDone() {
+  stopPlay();
+  const elapsed = Math.round((Date.now() - startTime) / 1000);
+  const realPPM = elapsed > 0 ? Math.round(words.length / elapsed * 60) : ppm;
+  document.getElementById("d-words").textContent = words.length;
+  document.getElementById("d-ppm").textContent   = realPPM + " ppm";
+  document.getElementById("d-time").textContent  = formatTime(elapsed);
+  document.getElementById("d-lvl").textContent   = levelLabel(realPPM);
+  showScreen("screen-done");
+}
+
+// ── PWA install / share target ─────────────────────────
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+
+// Handle Web Share Target (si está instalada como PWA y alguien comparte texto)
+const urlParams = new URLSearchParams(window.location.search);
+const sharedText = urlParams.get("text") || urlParams.get("title");
+if (sharedText) {
+  pasteInput.value = sharedText;
+  pasteInput.dispatchEvent(new Event("input"));
+}
+</script>
+</body>
+</html>
