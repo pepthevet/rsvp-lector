@@ -776,12 +776,13 @@ function getWordDelay(word, basePpm) {
 function scheduleNext() {
   if (!playing) return;
   const ppm = session.passes[session.currentPass].ppm;
-  // Delay based on the word just shown (current idx - 1, since we already advanced)
-  const prevWord = session.idx > 0 ? words[session.idx - 1] : '';
-  const delay = getWordDelay(prevWord, ppm);
+  // Delay is based on the word currently displayed
+  const currentWord = words[session.idx] || '';
+  const delay = getWordDelay(currentWord, ppm);
   readTimer = setTimeout(() => {
     if (!playing) return;
     session.idx++;
+    if (session.idx >= words.length) { checkBlockEnd(); return; }
     renderWord();
     checkBlockEnd();
     if (playing) scheduleNext();
@@ -789,11 +790,12 @@ function scheduleNext() {
 }
 
 function startReading() {
-  if (session.idx >= words.length) { session.idx = 0; renderWord(); }
+  if (session.idx >= words.length) { session.idx = 0; }
   playing = true;
   $('play-icon').textContent = '⏸';
   $('play-label').textContent = 'Pausar';
-  scheduleNext();
+  renderWord();      // show current word immediately
+  scheduleNext();    // then schedule advance
 }
 
 function stopReading() {
