@@ -26,6 +26,17 @@ html,body{height:100%;background:var(--bg);color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;
   -webkit-tap-highlight-color:transparent;overscroll-behavior:none;user-select:none}
 
+
+/* Toggle switch */
+.toggle-switch{position:relative;display:inline-block;width:44px;height:26px;flex-shrink:0}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:var(--border2);border-radius:26px;
+  transition:.3s;cursor:pointer}
+.toggle-slider:before{content:"";position:absolute;width:20px;height:20px;left:3px;bottom:3px;
+  background:#888;border-radius:50%;transition:.3s}
+.toggle-switch input:checked + .toggle-slider{background:var(--accent)}
+.toggle-switch input:checked + .toggle-slider:before{transform:translateX(18px);background:#111}
+
 /* ── SCREENS ── */
 .screen{display:none;flex-direction:column;height:100%;
   padding-top:var(--safe-top);padding-bottom:var(--safe-bot)}
@@ -219,7 +230,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
         <div><span class="val" id="speed-val">250</span> <span class="unit">ppm</span></div>
         <div class="lvl" id="speed-lvl">Promedio</div>
       </div>
-      <input type="range" id="speed-slider" min="100" max="700" step="50" value="250"
+      <input type="range" id="speed-slider" min="100" max="700" step="10" value="250"
              oninput="updateSpeedUI(this.value)">
     </div>
   </div>
@@ -252,6 +263,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
           <span id="pause-sec-val">25 seg</span>
           <button onclick="adjPause(+5)">+</button>
         </div>
+      <div class="cfg-row">
+        <div><div class="cfg-label">Micro-pausas en puntuación</div>
+          <div class="cfg-sub">Coma ×1.5 · Punto ×2.5 · Párrafo ×4.0</div></div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="mp-toggle" checked onchange="cfg.microPauses=this.checked">
+          <span class="toggle-slider"></span>
+        </label>
       </div>
     </div>
 
@@ -316,6 +334,20 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
     <div id="session-preview" style="font-size:12px;color:var(--muted);text-align:center;padding:4px 0"></div>
   </div>
 
+  <!-- Micropause toggle for libre mode -->
+  <div id="libre-mp-panel">
+    <div class="slider-wrap" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px">
+      <div>
+        <div style="font-size:14px;color:var(--text)">Micro-pausas en puntuación</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">Coma ×1.5 · Punto ×2.5 · Párrafo ×4.0</div>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="mp-toggle-libre" checked onchange="cfg.microPauses=this.checked;syncMpToggles(this)">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+  </div>
+
   <button class="btn-start" id="btn-start" onclick="startSession()" disabled>Iniciar</button>
 </div>
 
@@ -371,9 +403,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 
   <div class="reader-controls">
     <div class="speed-row-reader">
-      <button class="btn-speed" onclick="changeSpeed(-50)">−</button>
+      <button class="btn-speed" onclick="changeSpeed(-10)">−</button>
       <div class="speed-mini"><strong id="r-ppm">250</strong> ppm · <span id="r-lvl">Promedio</span></div>
-      <button class="btn-speed" onclick="changeSpeed(+50)">+</button>
+      <button class="btn-speed" onclick="changeSpeed(+10)">+</button>
     </div>
     <div class="main-controls">
       <button class="btn-ctrl" onclick="restartSession()"><span class="ci">↺</span><span>Reiniciar</span></button>
@@ -406,12 +438,16 @@ const DEMO = "El cerebro humano contiene aproximadamente cien mil millones de ne
 // Config
 let cfg = {
   ppm: 250,
-  mode: 'libre',       // 'libre' | 'train'
-  trainMode: 1,        // 1 | 2 | 3
-  blockMin: 2.0,       // minutes per block
-  pauseSec: 25,        // seconds pause
-  pct2: 30,            // % increase pass 2
-  pct3: 50,            // % increase pass 3
+  mode: 'libre',
+  trainMode: 1,
+  blockMin: 2.0,
+  pauseSec: 25,
+  pct2: 30,
+  pct3: 50,
+  microPauses: true,   // micro-pauses at punctuation
+  mpComma: 1.5,        // delay multiplier at comma
+  mpPeriod: 2.5,       // delay multiplier at sentence end (. ! ?)
+  mpParagraph: 4.0,    // delay multiplier at paragraph end
 };
 
 // Session state
@@ -530,11 +566,18 @@ function updateSpeedUI(val) {
   updateConfigPreviews();
 }
 
+function syncMpToggles(src) {
+  ['mp-toggle','mp-toggle-libre'].forEach(id => {
+    const el = $(id); if (el && el !== src) el.checked = cfg.microPauses;
+  });
+}
+
 function setMode(m) {
   cfg.mode = m;
   $('tab-libre').classList.toggle('active', m==='libre');
   $('tab-train').classList.toggle('active', m==='train');
   $('train-panel').style.display = m==='train' ? 'flex' : 'none';
+  $('libre-mp-panel').style.display = m==='libre' ? 'block' : 'none';
   updateConfigPreviews();
 }
 
@@ -720,23 +763,42 @@ function togglePlay() {
   if (playing) stopReading(); else startReading();
 }
 
+function getWordDelay(word, basePpm) {
+  const base = Math.round(60000 / basePpm);
+  if (!cfg.microPauses) return base;
+  // Check trailing punctuation of current word
+  if (/[\n]{2}/.test(word) || word.endsWith('\n')) return Math.round(base * cfg.mpParagraph);
+  if (/[.!?]['"»)\]]*$/.test(word)) return Math.round(base * cfg.mpPeriod);
+  if (/[,;:]['"»)\]]*$/.test(word)) return Math.round(base * cfg.mpComma);
+  return base;
+}
+
+function scheduleNext() {
+  if (!playing) return;
+  const ppm = session.passes[session.currentPass].ppm;
+  // Delay based on the word just shown (current idx - 1, since we already advanced)
+  const prevWord = session.idx > 0 ? words[session.idx - 1] : '';
+  const delay = getWordDelay(prevWord, ppm);
+  readTimer = setTimeout(() => {
+    if (!playing) return;
+    session.idx++;
+    renderWord();
+    checkBlockEnd();
+    if (playing) scheduleNext();
+  }, delay);
+}
+
 function startReading() {
   if (session.idx >= words.length) { session.idx = 0; renderWord(); }
   playing = true;
   $('play-icon').textContent = '⏸';
   $('play-label').textContent = 'Pausar';
-  const ppm = session.passes[session.currentPass].ppm;
-  const delay = Math.round(60000 / ppm);
-  readTimer = setInterval(() => {
-    session.idx++;
-    renderWord();
-    checkBlockEnd();
-  }, delay);
+  scheduleNext();
 }
 
 function stopReading() {
   playing = false;
-  clearInterval(readTimer); readTimer = null;
+  clearTimeout(readTimer); readTimer = null;
   $('play-icon').textContent = '▶';
   $('play-label').textContent = 'Continuar';
 }
