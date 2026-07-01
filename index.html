@@ -14,8 +14,8 @@
   --bg:#0a0a0a; --surface:#141414; --surface2:#1c1c1c;
   --border:#2a2a2a; --border2:#333;
   --accent:#e8ff47; --accent-dk:#b8cc1a;
-  --text:#f0f0f0; --muted:#666; --muted2:#444;
-  --box-bg:#ffffff; --box-text:#111; --box-red:#cc1a1a;
+  --text:#f0f0f0; --muted:#666;
+  --box-bg:#ffffff; --box-red:#cc1a1a;
   --green:#1db954; --orange:#ff8c00; --purple:#9b59b6;
   --r:12px;
   --safe-top:env(safe-area-inset-top,0px);
@@ -26,183 +26,179 @@ html,body{height:100%;background:var(--bg);color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;
   -webkit-tap-highlight-color:transparent;overscroll-behavior:none;user-select:none}
 
-
-/* Toggle switch */
-.toggle-switch{position:relative;display:inline-block;width:44px;height:26px;flex-shrink:0}
-.toggle-switch input{opacity:0;width:0;height:0}
-.toggle-slider{position:absolute;inset:0;background:var(--border2);border-radius:26px;
-  transition:.3s;cursor:pointer}
-.toggle-slider:before{content:"";position:absolute;width:20px;height:20px;left:3px;bottom:3px;
-  background:#888;border-radius:50%;transition:.3s}
-.toggle-switch input:checked + .toggle-slider{background:var(--accent)}
-.toggle-switch input:checked + .toggle-slider:before{transform:translateX(18px);background:#111}
-
-/* ── SCREENS ── */
 .screen{display:none;flex-direction:column;height:100%;
   padding-top:var(--safe-top);padding-bottom:var(--safe-bot)}
 .screen.active{display:flex}
 
-/* ── LOAD SCREEN ── */
-#screen-load{padding:20px 20px;gap:14px;overflow-y:auto}
+/* ── LOAD ── */
+#screen-load{padding:18px 18px;gap:12px;overflow-y:auto}
 .app-title{font-size:22px;font-weight:700;letter-spacing:-.5px;color:var(--accent)}
 .app-sub{font-size:13px;color:var(--muted);margin-top:2px}
 .section-label{font-size:11px;font-weight:600;letter-spacing:.08em;
-  text-transform:uppercase;color:var(--muted);margin-bottom:7px}
-.paste-area{background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r);padding:14px;min-height:110px;font-size:16px;
-  color:var(--text);line-height:1.5;outline:none;resize:none;width:100%;
-  font-family:inherit;-webkit-user-select:text;user-select:text}
+  text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.paste-area{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:12px;min-height:100px;font-size:16px;color:var(--text);line-height:1.5;
+  outline:none;resize:none;width:100%;font-family:inherit;
+  -webkit-user-select:text;user-select:text}
 .paste-area:focus{border-color:var(--accent)}
 .paste-area::placeholder{color:var(--muted)}
-.word-chip{font-size:12px;color:var(--muted);text-align:center;min-height:16px;margin-top:4px}
+.word-chip{font-size:12px;color:var(--muted);text-align:center;min-height:16px;margin-top:3px}
 .word-chip.ready{color:var(--accent)}
 .action-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.btn-action{background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r);padding:13px 10px;color:var(--text);font-size:14px;
-  font-weight:500;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer}
+.btn-action{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:12px 10px;color:var(--text);font-size:14px;font-weight:500;
+  display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer}
 .btn-action:active{background:#222}
-.btn-action .icon{font-size:22px}
+.btn-action .icon{font-size:20px}
 .btn-action .lbl{color:var(--muted);font-size:12px;font-weight:400}
 
-/* Speed slider */
-.slider-wrap{background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r);padding:14px}
+/* Slider */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px}
 .slider-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
 .slider-top .val{font-size:24px;font-weight:700;color:var(--accent);letter-spacing:-1px}
 .slider-top .unit{font-size:13px;color:var(--muted)}
 .slider-top .lvl{font-size:12px;color:var(--muted)}
 input[type=range]{-webkit-appearance:none;width:100%;height:4px;
   background:var(--border);border-radius:2px;outline:none}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;
   border-radius:50%;background:var(--accent);cursor:pointer}
 
-/* Mode selector tabs */
+/* Mode tabs */
 .mode-tabs{display:grid;grid-template-columns:1fr 1fr;gap:0;
   background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
 .mode-tab{padding:12px 8px;text-align:center;font-size:13px;font-weight:500;
-  color:var(--muted);cursor:pointer;border:none;background:none;transition:all .15s}
+  color:var(--muted);cursor:pointer;border:none;background:none}
 .mode-tab.active{background:var(--accent);color:#111;font-weight:700}
 
-/* Training config panel */
-.train-config{background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:12px}
-.cfg-row{display:flex;align-items:center;justify-content:space-between}
+/* Stepper */
+.cfg-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0}
 .cfg-label{font-size:14px;color:var(--text)}
 .cfg-sub{font-size:11px;color:var(--muted);margin-top:2px}
-.cfg-stepper{display:flex;align-items:center;gap:0;
-  background:var(--surface2);border:1px solid var(--border2);border-radius:8px;overflow:hidden}
-.cfg-stepper button{background:none;border:none;color:var(--text);
-  font-size:18px;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.cfg-stepper button:active{background:var(--border)}
-.cfg-stepper span{font-size:14px;font-weight:600;min-width:44px;text-align:center;color:var(--accent)}
+.stepper{display:flex;align-items:center;background:var(--surface2);
+  border:1px solid var(--border2);border-radius:8px;overflow:hidden}
+.stepper button{background:none;border:none;color:var(--text);font-size:20px;
+  width:38px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.stepper button:active{background:var(--border)}
+.stepper span{font-size:14px;font-weight:600;min-width:52px;text-align:center;color:var(--accent)}
 
-/* Training mode selector */
-.train-modes{display:flex;flex-direction:column;gap:8px}
-.train-mode-opt{display:flex;align-items:flex-start;gap:10px;padding:11px 12px;
+/* Toggle */
+.toggle-wrap{display:flex;align-items:center;justify-content:space-between;padding:6px 0}
+.toggle-label{font-size:14px;color:var(--text)}
+.toggle-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.tgl{position:relative;display:inline-block;width:44px;height:26px;flex-shrink:0}
+.tgl input{opacity:0;width:0;height:0}
+.tgl-slider{position:absolute;inset:0;background:var(--border2);border-radius:26px;
+  transition:.3s;cursor:pointer}
+.tgl-slider:before{content:"";position:absolute;width:20px;height:20px;left:3px;bottom:3px;
+  background:#888;border-radius:50%;transition:.3s}
+.tgl input:checked+.tgl-slider{background:var(--accent)}
+.tgl input:checked+.tgl-slider:before{transform:translateX(18px);background:#111}
+
+/* Train mode options */
+.train-opts{display:flex;flex-direction:column;gap:8px}
+.train-opt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;
   background:var(--surface2);border:1px solid var(--border2);border-radius:10px;cursor:pointer}
-.train-mode-opt.selected{border-color:var(--accent);background:#1a1f00}
-.train-mode-opt input[type=radio]{accent-color:var(--accent);margin-top:2px;flex-shrink:0}
-.train-mode-title{font-size:13px;font-weight:600;color:var(--text)}
-.train-mode-desc{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4}
-.train-mode-badge{display:inline-flex;gap:4px;margin-top:4px;flex-wrap:wrap}
+.train-opt.sel{border-color:var(--accent);background:#1a1f00}
+.train-opt input{accent-color:var(--accent);margin-top:3px;flex-shrink:0}
+.train-opt-title{font-size:13px;font-weight:600;color:var(--text)}
+.train-opt-desc{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4}
+.badges{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap}
 .badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
-.badge-1{background:#1a3320;color:var(--green)}
-.badge-2{background:#2a1f00;color:var(--orange)}
-.badge-3{background:#1f1028;color:var(--purple)}
+.b1{background:#1a3320;color:var(--green)}
+.b2{background:#2a1f00;color:var(--orange)}
+.b3{background:#1f1028;color:var(--purple)}
 
-/* Start button */
 .btn-start{background:var(--accent);color:#111;border:none;border-radius:var(--r);
-  padding:17px;font-size:17px;font-weight:700;width:100%;cursor:pointer;
-  letter-spacing:-.3px;transition:background .15s}
+  padding:16px;font-size:17px;font-weight:700;width:100%;cursor:pointer}
 .btn-start:active{background:var(--accent-dk)}
 .btn-start:disabled{background:var(--border);color:var(--muted)}
+.session-est{font-size:12px;color:var(--muted);text-align:center;padding:2px 0}
 
-/* ── READER SCREEN ── */
-#screen-reader{justify-content:space-between;padding:0}
-.reader-top{padding:calc(var(--safe-top) + 14px) 20px 10px;
+/* ── READER ── */
+#screen-reader{justify-content:space-between}
+.reader-top{padding:calc(var(--safe-top) + 12px) 18px 8px;
   display:flex;align-items:center;justify-content:space-between}
-.btn-back{background:none;border:none;color:var(--accent);
-  font-size:15px;font-weight:500;cursor:pointer;padding:4px 0}
-.reader-stat{font-size:12px;color:var(--muted);text-align:right;line-height:1.5}
-.reader-stat strong{color:var(--text)}
-.progress-track{height:2px;background:var(--border);margin:0 20px;border-radius:1px;overflow:hidden}
-.progress-fill{height:100%;background:var(--accent);border-radius:1px;
-  transition:width .1s linear;width:0%}
+.btn-back{background:none;border:none;color:var(--accent);font-size:15px;
+  font-weight:500;cursor:pointer}
+.reader-info{font-size:12px;color:var(--muted);text-align:right;line-height:1.6}
+.reader-info strong{color:var(--text)}
+.prog-track{height:2px;background:var(--border);margin:0 18px;border-radius:1px;overflow:hidden}
+.prog-fill{height:100%;background:var(--accent);border-radius:1px;width:0%;transition:width .15s}
 
-/* Pass indicator */
-.pass-indicator{display:flex;align-items:center;justify-content:center;
-  gap:6px;padding:8px 20px}
-.pass-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all .3s}
-.pass-dot.active{background:var(--accent);transform:scale(1.3)}
-.pass-dot.done{background:var(--muted2)}
-.pass-label{font-size:12px;color:var(--muted);margin-left:4px}
+/* Pass dots */
+.pass-row{display:flex;align-items:center;justify-content:center;gap:8px;padding:7px 0}
+.pdot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all .3s}
+.pdot.active{background:var(--accent);transform:scale(1.3)}
+.pdot.done{background:var(--muted)}
+.pass-txt{font-size:12px;color:var(--muted)}
 
-/* White word box */
-.word-stage{flex:1;display:flex;align-items:center;justify-content:center;padding:16px 20px}
-.word-box{background:var(--box-bg);border-radius:20px;width:100%;max-width:360px;
-  aspect-ratio:16/7;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;position:relative;transition:opacity .3s}
-.word-box.dimmed{opacity:.15}
-.orp-marker-top{position:absolute;top:12px;font-size:10px;color:#bbb;pointer-events:none}
-.orp-marker-bot{position:absolute;bottom:12px;font-size:10px;color:#bbb;pointer-events:none}
-.word-display{font-size:clamp(26px,7vw,38px);font-weight:700;color:var(--box-text);
+/* Word box */
+.word-stage{flex:1;display:flex;align-items:center;justify-content:center;padding:12px 18px}
+.word-box-wrap{position:relative;width:100%;max-width:360px}
+.word-box{background:var(--box-bg);border-radius:20px;width:100%;aspect-ratio:16/7;
+  display:flex;align-items:center;justify-content:center;position:relative}
+.orp-top{position:absolute;top:10px;font-size:10px;color:#bbb;pointer-events:none}
+.orp-bot{position:absolute;bottom:10px;font-size:10px;color:#bbb;pointer-events:none}
+.word-disp{font-size:clamp(24px,7vw,38px);font-weight:700;color:#111;
   letter-spacing:-.5px;line-height:1;display:flex;align-items:baseline}
 .word-pivot{color:var(--box-red)}
 .word-idle{font-size:15px;color:#aaa;font-weight:400}
 
-/* ── PAUSE OVERLAY ── */
-.pause-overlay{position:absolute;inset:0;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:6px;
-  background:rgba(10,10,10,.92);border-radius:20px;z-index:10}
-.pause-overlay.hidden{display:none}
-.pause-title{font-size:13px;color:var(--muted);font-weight:500}
-.pause-countdown{font-size:48px;font-weight:700;color:var(--accent);letter-spacing:-2px}
-.pause-subtitle{font-size:12px;color:var(--muted)}
-.pause-ring{position:relative;width:80px;height:80px}
+/* Pause overlay */
+.pause-ov{position:absolute;inset:0;border-radius:20px;
+  background:rgba(10,10,10,.93);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:6px;z-index:5}
+.pause-ov.hidden{display:none}
+.pause-ov-title{font-size:13px;color:var(--muted);font-weight:500}
+.pause-ring{position:relative;width:76px;height:76px}
 .pause-ring svg{transform:rotate(-90deg)}
 .pause-ring-num{position:absolute;inset:0;display:flex;align-items:center;
-  justify-content:center;font-size:28px;font-weight:700;color:var(--accent)}
+  justify-content:center;font-size:26px;font-weight:700;color:var(--accent)}
+.pause-sub{font-size:11px;color:var(--muted);text-align:center;padding:0 12px}
+.btn-skip{margin-top:4px;background:none;border:1px solid var(--border2);
+  border-radius:20px;color:var(--muted);font-size:12px;padding:5px 14px;cursor:pointer}
 
-/* Reader controls */
-.reader-controls{padding:0 20px calc(var(--safe-bot) + 20px);display:flex;flex-direction:column;gap:12px}
-.speed-row-reader{display:flex;align-items:center;gap:12px}
-.btn-speed{width:42px;height:42px;border-radius:50%;background:var(--surface);
-  border:1px solid var(--border);color:var(--text);font-size:20px;display:flex;
-  align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
-.btn-speed:active{background:#222}
-.speed-mini{flex:1;text-align:center;font-size:13px;color:var(--muted)}
-.speed-mini strong{color:var(--accent);font-size:16px}
-.main-controls{display:grid;grid-template-columns:1fr 2fr 1fr;gap:10px}
+/* Controls */
+.reader-ctrls{padding:0 18px calc(var(--safe-bot) + 18px);display:flex;flex-direction:column;gap:10px}
+.speed-row{display:flex;align-items:center;gap:10px}
+.btn-spd{width:40px;height:40px;border-radius:50%;background:var(--surface);
+  border:1px solid var(--border);color:var(--text);font-size:20px;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.btn-spd:active{background:#222}
+.speed-info{flex:1;text-align:center;font-size:13px;color:var(--muted)}
+.speed-info strong{color:var(--accent);font-size:16px}
+.ctrl-row{display:grid;grid-template-columns:1fr 2fr 1fr;gap:10px}
 .btn-ctrl{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
-  color:var(--text);font-size:12px;font-weight:500;padding:13px 8px;cursor:pointer;
+  color:var(--text);font-size:12px;font-weight:500;padding:12px 8px;cursor:pointer;
   display:flex;flex-direction:column;align-items:center;gap:4px}
 .btn-ctrl:active{background:#222}
-.btn-ctrl .ci{font-size:20px}
-.btn-play-main{background:var(--accent);border-color:var(--accent);color:#111}
-.btn-play-main:active{background:var(--accent-dk)}
+.btn-ctrl .ic{font-size:20px}
+.btn-play{background:var(--accent);border-color:var(--accent);color:#111}
+.btn-play:active{background:var(--accent-dk)}
 
-/* ── DONE SCREEN ── */
-#screen-done{align-items:center;justify-content:center;gap:18px;padding:32px 24px}
+/* ── DONE ── */
+#screen-done{align-items:center;justify-content:center;gap:16px;padding:32px 22px}
 .done-icon{font-size:52px}
-.done-title{font-size:24px;font-weight:700;color:var(--accent);letter-spacing:-.5px}
+.done-title{font-size:24px;font-weight:700;color:var(--accent)}
 .done-stats{background:var(--surface);border:1px solid var(--border);
   border-radius:var(--r);width:100%;overflow:hidden}
-.done-row{display:flex;justify-content:space-between;padding:13px 16px;
+.done-row{display:flex;justify-content:space-between;padding:12px 16px;
   font-size:14px;border-bottom:1px solid var(--border)}
 .done-row:last-child{border-bottom:none}
 .done-row span{color:var(--muted)}
 .done-row strong{color:var(--text)}
 .btn-again{background:var(--accent);color:#111;border:none;border-radius:var(--r);
-  padding:15px 32px;font-size:16px;font-weight:700;cursor:pointer;width:100%}
+  padding:15px;font-size:16px;font-weight:700;cursor:pointer;width:100%}
 #file-input{display:none}
 </style>
 </head>
 <body>
 
-<!-- ── LOAD SCREEN ── -->
+<!-- ── LOAD ── -->
 <div id="screen-load" class="screen active">
-  <div style="display:flex;align-items:flex-start;justify-content:space-between;padding-top:8px">
-    <div><div class="app-title">RSVP Lector</div><div class="app-sub">Entrena tu lectura rápida</div></div>
+  <div style="padding-top:6px">
+    <div class="app-title">RSVP Lector</div>
+    <div class="app-sub">Entrena tu lectura rápida</div>
   </div>
 
   <div>
@@ -211,27 +207,25 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
     <div class="word-chip" id="word-chip"></div>
   </div>
 
-  <div>
-    <div class="action-row">
-      <button class="btn-action" onclick="openFile()">
-        <span class="icon">📄</span><span>Fichero .txt</span><span class="lbl">desde Archivos</span>
-      </button>
-      <button class="btn-action" onclick="loadDemo()">
-        <span class="icon">🎯</span><span>Texto demo</span><span class="lbl">para probar</span>
-      </button>
-    </div>
-    <input type="file" id="file-input" accept=".txt,text/plain" onchange="loadFile(event)">
+  <div class="action-row">
+    <button class="btn-action" onclick="openFile()">
+      <span class="icon">📄</span><span>Fichero .txt</span><span class="lbl">desde Archivos</span>
+    </button>
+    <button class="btn-action" onclick="loadDemo()">
+      <span class="icon">🎯</span><span>Texto demo</span><span class="lbl">para probar</span>
+    </button>
   </div>
+  <input type="file" id="file-input" accept=".txt,text/plain" onchange="loadFile(event)">
 
   <div>
     <div class="section-label">Velocidad base</div>
-    <div class="slider-wrap">
+    <div class="card">
       <div class="slider-top">
-        <div><span class="val" id="speed-val">250</span> <span class="unit">ppm</span></div>
-        <div class="lvl" id="speed-lvl">Promedio</div>
+        <div><span class="val" id="spd-val">250</span> <span class="unit">ppm</span></div>
+        <div class="lvl" id="spd-lvl">Promedio</div>
       </div>
-      <input type="range" id="speed-slider" min="100" max="700" step="10" value="250"
-             oninput="updateSpeedUI(this.value)">
+      <input type="range" id="spd-slider" min="100" max="700" step="10" value="250"
+             oninput="onSpeedSlider(this.value)">
     </div>
   </div>
 
@@ -243,200 +237,176 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
     </div>
   </div>
 
-  <!-- Training config (hidden in libre mode) -->
+  <!-- Micro-pauses (both modes) -->
+  <div class="card">
+    <div class="toggle-wrap">
+      <div><div class="toggle-label">Micro-pausas en puntuación</div>
+        <div class="toggle-sub">Coma ×1.5 · Punto ×2.5 · Párrafo ×4</div></div>
+      <label class="tgl"><input type="checkbox" id="mp-chk" checked onchange="cfg.microPauses=this.checked">
+        <span class="tgl-slider"></span></label>
+    </div>
+  </div>
+
+  <!-- Train panel -->
   <div id="train-panel" style="display:none;flex-direction:column;gap:12px">
-    <div class="train-config">
+    <div class="card" style="display:flex;flex-direction:column;gap:4px">
       <div class="cfg-row">
         <div><div class="cfg-label">Duración del bloque</div>
-          <div class="cfg-sub" id="block-words-preview">≈ 500 palabras por bloque</div></div>
-        <div class="cfg-stepper">
+          <div class="cfg-sub" id="block-preview">≈ 500 palabras</div></div>
+        <div class="stepper">
           <button onclick="adjBlock(-0.5)">−</button>
-          <span id="block-min-val">2.0 min</span>
+          <span id="block-val">2.0 min</span>
           <button onclick="adjBlock(+0.5)">+</button>
         </div>
       </div>
       <div class="cfg-row">
-        <div><div class="cfg-label">Pausa entre bloques</div>
-          <div class="cfg-sub">Pantalla neutra, descansa la vista</div></div>
-        <div class="cfg-stepper">
+        <div><div class="cfg-label">Pausa entre bloques</div></div>
+        <div class="stepper">
           <button onclick="adjPause(-5)">−</button>
-          <span id="pause-sec-val">25 seg</span>
+          <span id="pause-val">25 seg</span>
           <button onclick="adjPause(+5)">+</button>
         </div>
-      <div class="cfg-row">
-        <div><div class="cfg-label">Micro-pausas en puntuación</div>
-          <div class="cfg-sub">Coma ×1.5 · Punto ×2.5 · Párrafo ×4.0</div></div>
-        <label class="toggle-switch">
-          <input type="checkbox" id="mp-toggle" checked onchange="cfg.microPauses=this.checked">
-          <span class="toggle-slider"></span>
-        </label>
       </div>
     </div>
 
     <div>
       <div class="section-label">Modo de repetición</div>
-      <div class="train-modes">
-        <label class="train-mode-opt selected">
-          <input type="radio" name="train-mode" value="1" checked onchange="selectTrainMode(this)">
-          <div>
-            <div class="train-mode-title">Lectura única con pausas</div>
-            <div class="train-mode-desc">Una lectura a velocidad base, con descansos cada bloque.</div>
-            <div class="train-mode-badge"><span class="badge badge-1">×1 lectura</span></div>
-          </div>
+      <div class="train-opts">
+        <label class="train-opt sel">
+          <input type="radio" name="trm" value="1" checked onchange="setTrainMode(1)">
+          <div><div class="train-opt-title">Una lectura con pausas</div>
+            <div class="train-opt-desc">Velocidad base con descansos cada bloque.</div>
+            <div class="badges"><span class="badge b1">×1</span></div></div>
         </label>
-        <label class="train-mode-opt">
-          <input type="radio" name="train-mode" value="2" onchange="selectTrainMode(this)">
-          <div>
-            <div class="train-mode-title">Doble lectura — Over-Speed</div>
-            <div class="train-mode-desc">Primera a velocidad base. Segunda al <span id="pct2-lbl">+30%</span> para fijar y subir umbral.</div>
-            <div class="train-mode-badge">
-              <span class="badge badge-1">×1 normal</span>
-              <span class="badge badge-2">×1 rápida</span>
-            </div>
-          </div>
+        <label class="train-opt">
+          <input type="radio" name="trm" value="2" onchange="setTrainMode(2)">
+          <div><div class="train-opt-title">Doble lectura — Over-Speed</div>
+            <div class="train-opt-desc">Base + segunda pasada más rápida para fijar.</div>
+            <div class="badges"><span class="badge b1">×1 normal</span>
+              <span class="badge b2" id="b2a">×1 +30%</span></div></div>
         </label>
-        <label class="train-mode-opt">
-          <input type="radio" name="train-mode" value="3" onchange="selectTrainMode(this)">
-          <div>
-            <div class="train-mode-title">Triple lectura — Over-Speed máximo</div>
-            <div class="train-mode-desc">Base → <span id="pct2b-lbl">+30%</span> → <span id="pct3-lbl">+50%</span>. Máxima mejora de velocidad lectora.</div>
-            <div class="train-mode-badge">
-              <span class="badge badge-1">×1 normal</span>
-              <span class="badge badge-2">×1 rápida</span>
-              <span class="badge badge-3">×1 máxima</span>
-            </div>
-          </div>
+        <label class="train-opt">
+          <input type="radio" name="trm" value="3" onchange="setTrainMode(3)">
+          <div><div class="train-opt-title">Triple lectura — Over-Speed máximo</div>
+            <div class="train-opt-desc">Máxima mejora de velocidad y retención.</div>
+            <div class="badges"><span class="badge b1">×1 normal</span>
+              <span class="badge b2" id="b2b">×1 +30%</span>
+              <span class="badge b3" id="b3a">×1 +50%</span></div></div>
         </label>
       </div>
     </div>
 
-    <div class="train-config">
+    <div class="card" style="display:flex;flex-direction:column;gap:4px">
       <div class="cfg-row">
         <div><div class="cfg-label">Incremento 2ª lectura</div>
-          <div class="cfg-sub" id="pass2-speed-preview">250 → 325 ppm</div></div>
-        <div class="cfg-stepper">
+          <div class="cfg-sub" id="p2-preview">250 → 325 ppm</div></div>
+        <div class="stepper">
           <button onclick="adjPct(2,-5)">−</button>
           <span id="pct2-val">+30%</span>
           <button onclick="adjPct(2,+5)">+</button>
         </div>
       </div>
-      <div class="cfg-row" id="pct3-row">
+      <div class="cfg-row" id="row-pct3">
         <div><div class="cfg-label">Incremento 3ª lectura</div>
-          <div class="cfg-sub" id="pass3-speed-preview">250 → 375 ppm</div></div>
-        <div class="cfg-stepper">
+          <div class="cfg-sub" id="p3-preview">250 → 375 ppm</div></div>
+        <div class="stepper">
           <button onclick="adjPct(3,-5)">−</button>
           <span id="pct3-val">+50%</span>
           <button onclick="adjPct(3,+5)">+</button>
         </div>
       </div>
     </div>
-
-    <div id="session-preview" style="font-size:12px;color:var(--muted);text-align:center;padding:4px 0"></div>
-  </div>
-
-  <!-- Micropause toggle for libre mode -->
-  <div id="libre-mp-panel">
-    <div class="slider-wrap" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px">
-      <div>
-        <div style="font-size:14px;color:var(--text)">Micro-pausas en puntuación</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:2px">Coma ×1.5 · Punto ×2.5 · Párrafo ×4.0</div>
-      </div>
-      <label class="toggle-switch">
-        <input type="checkbox" id="mp-toggle-libre" checked onchange="cfg.microPauses=this.checked;syncMpToggles(this)">
-        <span class="toggle-slider"></span>
-      </label>
-    </div>
+    <div class="session-est" id="sess-est"></div>
   </div>
 
   <button class="btn-start" id="btn-start" onclick="startSession()" disabled>Iniciar</button>
 </div>
 
-<!-- ── READER SCREEN ── -->
+<!-- ── READER ── -->
 <div id="screen-reader" class="screen">
   <div class="reader-top">
     <button class="btn-back" onclick="goBack()">← Salir</button>
-    <div class="reader-stat">
+    <div class="reader-info">
       <strong id="r-idx">0</strong>/<span id="r-total">0</span>
       &nbsp;·&nbsp;<strong id="r-pct">0</strong>%
-      &nbsp;·&nbsp;<span id="r-pass-label" style="color:var(--accent)"></span>
+      &nbsp;<span id="r-pass-spd" style="color:var(--accent)"></span>
     </div>
   </div>
-  <div class="progress-track"><div class="progress-fill" id="r-progress"></div></div>
+  <div class="prog-track"><div class="prog-fill" id="r-prog"></div></div>
 
-  <!-- Pass dots (only shown in training mode) -->
-  <div class="pass-indicator" id="pass-indicator" style="display:none">
-    <div class="pass-dot" id="dot-1"></div>
-    <div class="pass-dot" id="dot-2" style="display:none"></div>
-    <div class="pass-dot" id="dot-3" style="display:none"></div>
-    <span class="pass-label" id="pass-label-txt"></span>
+  <div class="pass-row" id="pass-row" style="display:none">
+    <div class="pdot" id="pd1"></div>
+    <div class="pdot" id="pd2" style="display:none"></div>
+    <div class="pdot" id="pd3" style="display:none"></div>
+    <span class="pass-txt" id="pass-txt"></span>
   </div>
 
   <div class="word-stage">
-    <div style="position:relative;width:100%;max-width:360px">
+    <div class="word-box-wrap">
       <div class="word-box" id="word-box">
-        <div class="orp-marker-top" id="orp-top">▼</div>
-        <div class="word-display" id="word-display">
+        <div class="orp-top" id="orp-top" style="opacity:0">▼</div>
+        <div class="word-disp" id="word-disp">
           <span class="word-idle">Pulsa ▶ para empezar</span>
         </div>
-        <div class="orp-marker-bot" id="orp-bot">▲</div>
+        <div class="orp-bot" id="orp-bot" style="opacity:0">▲</div>
       </div>
-      <!-- Pause overlay inside the word-box area -->
-      <div class="pause-overlay hidden" id="pause-overlay" style="border-radius:20px">
-        <div class="pause-title" id="pause-title">Pausa — descansa la vista</div>
+      <div class="pause-ov hidden" id="pause-ov">
+        <div class="pause-ov-title" id="pov-title">Pausa — descansa la vista</div>
         <div class="pause-ring">
-          <svg width="80" height="80" viewBox="0 0 80 80">
-            <circle cx="40" cy="40" r="34" fill="none" stroke="#2a2a2a" stroke-width="6"/>
-            <circle id="pause-arc" cx="40" cy="40" r="34" fill="none"
-              stroke="#e8ff47" stroke-width="6" stroke-linecap="round"
-              stroke-dasharray="213.6" stroke-dashoffset="0"/>
+          <svg width="76" height="76" viewBox="0 0 76 76">
+            <circle cx="38" cy="38" r="32" fill="none" stroke="#2a2a2a" stroke-width="5"/>
+            <circle id="parc" cx="38" cy="38" r="32" fill="none" stroke="#e8ff47"
+              stroke-width="5" stroke-linecap="round"
+              stroke-dasharray="201" stroke-dashoffset="0"/>
           </svg>
-          <div class="pause-ring-num" id="pause-num">25</div>
+          <div class="pause-ring-num" id="pov-num">25</div>
         </div>
-        <div class="pause-subtitle" id="pause-sub"></div>
-        <button onclick="skipPause()" style="margin-top:6px;background:none;border:1px solid var(--border2);
-          border-radius:20px;color:var(--muted);font-size:12px;padding:5px 14px;cursor:pointer">
-          Saltar pausa
-        </button>
+        <div class="pause-sub" id="pov-sub"></div>
+        <button class="btn-skip" onclick="skipPause()">Saltar pausa</button>
       </div>
     </div>
   </div>
 
-  <div class="reader-controls">
-    <div class="speed-row-reader">
-      <button class="btn-speed" onclick="changeSpeed(-10)">−</button>
-      <div class="speed-mini"><strong id="r-ppm">250</strong> ppm · <span id="r-lvl">Promedio</span></div>
-      <button class="btn-speed" onclick="changeSpeed(+10)">+</button>
+  <div class="reader-ctrls">
+    <div class="speed-row">
+      <button class="btn-spd" onclick="chgSpd(-10)">−</button>
+      <div class="speed-info"><strong id="r-ppm">250</strong> ppm · <span id="r-lvl">Promedio</span></div>
+      <button class="btn-spd" onclick="chgSpd(+10)">+</button>
     </div>
-    <div class="main-controls">
-      <button class="btn-ctrl" onclick="restartSession()"><span class="ci">↺</span><span>Reiniciar</span></button>
-      <button class="btn-ctrl btn-play-main" id="btn-play" onclick="togglePlay()">
-        <span class="ci" id="play-icon">▶</span><span id="play-label">Iniciar</span>
+    <div class="ctrl-row">
+      <button class="btn-ctrl" onclick="restartSession()"><span class="ic">↺</span><span>Reiniciar</span></button>
+      <button class="btn-ctrl btn-play" id="btn-play" onclick="togglePlay()">
+        <span class="ic" id="play-ic">▶</span><span id="play-lbl">Iniciar</span>
       </button>
-      <button class="btn-ctrl" onclick="goBack()"><span class="ci">✕</span><span>Salir</span></button>
+      <button class="btn-ctrl" onclick="goBack()"><span class="ic">✕</span><span>Salir</span></button>
     </div>
   </div>
 </div>
 
-<!-- ── DONE SCREEN ── -->
+<!-- ── DONE ── -->
 <div id="screen-done" class="screen">
   <div class="done-icon">✓</div>
-  <div class="done-title" id="done-title">¡Texto completado!</div>
+  <div class="done-title">¡Completado!</div>
   <div class="done-stats">
     <div class="done-row"><span>Palabras</span><strong id="d-words">—</strong></div>
     <div class="done-row"><span>Modo</span><strong id="d-mode">—</strong></div>
     <div class="done-row"><span>Velocidad base</span><strong id="d-ppm">—</strong></div>
     <div class="done-row"><span>Tiempo total</span><strong id="d-time">—</strong></div>
-    <div class="done-row"><span>Pasadas completadas</span><strong id="d-passes">—</strong></div>
+    <div class="done-row"><span>Pasadas</span><strong id="d-passes">—</strong></div>
   </div>
   <button class="btn-again" onclick="showLoad()">Leer otro texto</button>
 </div>
 
 <script>
-// ── CONSTANTS & STATE ──────────────────────────────────────────────────────────
-const DEMO = "El cerebro humano contiene aproximadamente cien mil millones de neuronas interconectadas entre sí. Cada neurona puede establecer miles de conexiones sinápticas con otras células nerviosas. Esta red neuronal es la base de todo pensamiento, memoria y emoción que experimentamos a lo largo de nuestra vida. Los científicos estiman que el número total de conexiones posibles supera al de átomos en el universo observable. La plasticidad cerebral nos permite aprender nuevas habilidades y modificar hábitos incluso en la edad adulta. El entrenamiento con RSVP explota este principio: al forzar al ojo a fijarse en un único punto, se elimina el movimiento sacádico innecesario y se entrena el procesamiento visual puro. Con sesiones diarias de diez minutos verás resultados en pocas semanas. La clave es la constancia y el aumento gradual de la velocidad, respetando siempre tu nivel de comprensión actual.";
+// ─────────────────────────────────────────────────────────────────────────────
+// DEMO TEXT
+// ─────────────────────────────────────────────────────────────────────────────
+const DEMO = "El cerebro humano contiene aproximadamente cien mil millones de neuronas interconectadas entre sí. Cada neurona puede establecer miles de conexiones sinápticas con otras células nerviosas.\n\nEsta red neuronal es la base de todo pensamiento, memoria y emoción que experimentamos a lo largo de nuestra vida. Los científicos estiman que el número total de conexiones posibles supera al de átomos en el universo observable.\n\nLa plasticidad cerebral nos permite aprender nuevas habilidades y modificar hábitos incluso en la edad adulta. El entrenamiento con RSVP explota este principio: al forzar al ojo a fijarse en un único punto, se elimina el movimiento sacádico innecesario y se entrena el procesamiento visual puro.\n\nCon sesiones diarias de diez minutos verás resultados en pocas semanas. La clave es la constancia y el aumento gradual de la velocidad, respetando siempre tu nivel de comprensión actual.";
 
-// Config
-let cfg = {
+// ─────────────────────────────────────────────────────────────────────────────
+// CONFIG
+// ─────────────────────────────────────────────────────────────────────────────
+const cfg = {
   ppm: 250,
   mode: 'libre',
   trainMode: 1,
@@ -444,497 +414,451 @@ let cfg = {
   pauseSec: 25,
   pct2: 30,
   pct3: 50,
-  microPauses: true,   // micro-pauses at punctuation
-  mpComma: 1.5,        // delay multiplier at comma
-  mpPeriod: 2.5,       // delay multiplier at sentence end (. ! ?)
-  mpParagraph: 4.0,    // delay multiplier at paragraph end
+  microPauses: true,
 };
 
-// Session state
-let words = [];
-let session = null;   // built by buildSession()
-
-/*
-  session = {
-    passes: [
-      { ppm, startIdx, endIdx (exclusive), blocks:[{start,end}] },
-      ...
-    ],
-    currentPass: 0,
-    currentBlock: 0,
-    idx: 0,
-    phase: 'reading' | 'pause',
-    pauseType: 'block' | 'pass',
-  }
-*/
-
-let playing = false;
-let readTimer = null;
+// ─────────────────────────────────────────────────────────────────────────────
+// STATE  (reset on each session)
+// ─────────────────────────────────────────────────────────────────────────────
+let words      = [];
+let passes     = [];   // [{ppm, blocks:[{start,end}]}]
+let passIdx    = 0;
+let blockIdx   = 0;
+let wordIdx    = 0;
+let running    = false;
+let inPause    = false;
+let wordTimer  = null;
 let pauseTimer = null;
-let startTime = null;
+let pauseCb    = null;
+let pauseLeft  = 0;
+let sessionStart = 0;
 
-// ── HELPERS ───────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
 
-function levelLabel(p) {
-  if (p < 200) return "Lento";
-  if (p < 300) return "Promedio";
-  if (p < 450) return "Ágil";
-  if (p < 600) return "Avanzado";
+function lvl(p){
+  if(p<200) return "Lento";
+  if(p<300) return "Promedio";
+  if(p<450) return "Ágil";
+  if(p<600) return "Avanzado";
   return "Experto";
 }
 
-function getORP(word) {
-  const c = word.replace(/[^a-záéíóúüñA-ZÁÉÍÓÚÜÑ]/g,"");
+function orp(w){
+  const c = w.replace(/[^a-záéíóúüñA-ZÁÉÍÓÚÜÑ]/g,'');
   const l = c.length;
-  if (l<=1) return 0; if (l<=5) return 1;
+  if(l<=1) return 0; if(l<=5) return 1;
   return Math.floor(l*0.35);
 }
 
-function tokenize(text) { return text.trim().split(/\s+/).filter(Boolean); }
+function tokenize(t){ return t.trim().split(/\s+/).filter(Boolean); }
 
-function formatTime(sec) {
-  sec = Math.round(sec);
-  if (sec < 60) return sec + "s";
-  const m = Math.floor(sec/60), s = sec%60;
-  return s > 0 ? `${m}m ${s}s` : `${m}m`;
+function fmt(s){
+  s=Math.round(s);
+  if(s<60) return s+'s';
+  return Math.floor(s/60)+'m '+(s%60>0?s%60+'s':'');
 }
 
-function wordsForMinutes(ppm, minutes) { return Math.round(ppm * minutes); }
+// Delay for a word in ms (micro-pauses based on trailing punctuation)
+function wordDelay(w, ppm){
+  const base = 60000 / ppm;
+  if(!cfg.microPauses) return base;
+  if(/\n/.test(w))              return base * 4.0;  // paragraph
+  if(/[.!?]['"»)\]]*$/.test(w)) return base * 2.5;  // sentence end
+  if(/[,;:]['"»)\]]*$/.test(w)) return base * 1.5;  // comma
+  return base;
+}
 
-// Find paragraph boundary at or before idx (search backwards for \n\n or end of sentence)
-function findParaBoundary(words, idx) {
-  // Look backwards up to 50 words for a word ending in '.' or that preceded a blank token
-  for (let i = idx; i >= Math.max(0, idx - 60); i--) {
-    const w = words[i];
-    if (/[.!?]$/.test(w)) return i + 1;
+// Find sentence boundary at or before idx (search back max 60 words)
+function sentBoundary(idx){
+  for(let i=Math.min(idx, words.length-1); i>=Math.max(0,idx-60); i--){
+    if(/[.!?\n]['"»)\]]*$/.test(words[i])) return i+1;
   }
-  return idx; // fallback
+  return idx;
 }
 
-// Build blocks that end at paragraph/sentence boundaries
-function buildBlocks(startIdx, endIdx, blockWords) {
-  const blocks = [];
-  let pos = startIdx;
-  while (pos < endIdx) {
-    let target = Math.min(pos + blockWords, endIdx);
-    if (target < endIdx) {
-      target = findParaBoundary(words, target);
-      if (target <= pos) target = pos + blockWords; // safety
-      target = Math.min(target, endIdx);
-    }
-    blocks.push({ start: pos, end: target });
-    pos = target;
+// Build block list for a pass
+function makeBlocks(ppm){
+  const bw = Math.round(ppm * cfg.blockMin);
+  const blks = [];
+  let pos = 0;
+  while(pos < words.length){
+    let end = pos + bw;
+    if(end < words.length) end = sentBoundary(end);
+    end = Math.min(end, words.length);
+    if(end <= pos) end = Math.min(pos + bw, words.length);
+    blks.push({start:pos, end:end});
+    pos = end;
   }
-  return blocks;
+  return blks;
 }
 
-// Build full session plan
-function buildSession() {
-  const total = words.length;
-  const blockWords = wordsForMinutes(cfg.ppm, cfg.blockMin);
-
-  const passSpeeds = [cfg.ppm];
-  if (cfg.mode === 'train' && cfg.trainMode >= 2)
-    passSpeeds.push(Math.round(cfg.ppm * (1 + cfg.pct2/100)));
-  if (cfg.mode === 'train' && cfg.trainMode >= 3)
-    passSpeeds.push(Math.round(cfg.ppm * (1 + cfg.pct3/100)));
-
-  const passes = passSpeeds.map(ppm => {
-    const bw = wordsForMinutes(ppm, cfg.blockMin);
-    return { ppm, startIdx: 0, endIdx: total, blocks: buildBlocks(0, total, bw) };
-  });
-
-  return {
-    passes,
-    currentPass: 0,
-    currentBlock: 0,
-    idx: 0,
-    phase: 'reading',
-    pauseType: null,
-  };
+// ─────────────────────────────────────────────────────────────────────────────
+// LOAD SCREEN UI
+// ─────────────────────────────────────────────────────────────────────────────
+function onSpeedSlider(v){
+  cfg.ppm = parseInt(v);
+  $('spd-val').textContent = cfg.ppm;
+  $('spd-lvl').textContent = lvl(cfg.ppm);
+  updatePreviews();
 }
 
-// ── UI — CONFIG ───────────────────────────────────────────────────────────────
-function updateSpeedUI(val) {
-  cfg.ppm = parseInt(val);
-  $('speed-val').textContent = cfg.ppm;
-  $('speed-lvl').textContent = levelLabel(cfg.ppm);
-  $('r-ppm').textContent = cfg.ppm;
-  $('r-lvl').textContent = levelLabel(cfg.ppm);
-  $('speed-slider').value = cfg.ppm;
-  updateConfigPreviews();
-}
-
-function syncMpToggles(src) {
-  ['mp-toggle','mp-toggle-libre'].forEach(id => {
-    const el = $(id); if (el && el !== src) el.checked = cfg.microPauses;
-  });
-}
-
-function setMode(m) {
+function setMode(m){
   cfg.mode = m;
   $('tab-libre').classList.toggle('active', m==='libre');
   $('tab-train').classList.toggle('active', m==='train');
   $('train-panel').style.display = m==='train' ? 'flex' : 'none';
-  $('libre-mp-panel').style.display = m==='libre' ? 'block' : 'none';
-  updateConfigPreviews();
+  updatePreviews();
 }
 
-function selectTrainMode(radio) {
-  cfg.trainMode = parseInt(radio.value);
-  document.querySelectorAll('.train-mode-opt').forEach(el => {
-    el.classList.toggle('selected', el.querySelector('input').value == cfg.trainMode);
+function setTrainMode(n){
+  cfg.trainMode = n;
+  document.querySelectorAll('.train-opt').forEach(el=>{
+    el.classList.toggle('sel', parseInt(el.querySelector('input').value)===n);
   });
-  $('pct3-row').style.display = cfg.trainMode >= 3 ? 'flex' : 'none';
-  updateConfigPreviews();
+  $('row-pct3').style.display = n>=3 ? 'flex' : 'none';
+  updatePreviews();
 }
 
-function adjBlock(delta) {
-  cfg.blockMin = Math.max(0.5, Math.min(10, cfg.blockMin + delta));
-  $('block-min-val').textContent = cfg.blockMin.toFixed(1) + ' min';
-  updateConfigPreviews();
+function adjBlock(d){
+  cfg.blockMin = Math.max(0.5, Math.min(10, cfg.blockMin+d));
+  $('block-val').textContent = cfg.blockMin.toFixed(1)+' min';
+  updatePreviews();
 }
 
-function adjPause(delta) {
-  cfg.pauseSec = Math.max(5, Math.min(120, cfg.pauseSec + delta));
-  $('pause-sec-val').textContent = cfg.pauseSec + ' seg';
+function adjPause(d){
+  cfg.pauseSec = Math.max(5, Math.min(120, cfg.pauseSec+d));
+  $('pause-val').textContent = cfg.pauseSec+' seg';
 }
 
-function adjPct(pass, delta) {
-  if (pass===2) {
-    cfg.pct2 = Math.max(5, Math.min(100, cfg.pct2 + delta));
-    $('pct2-val').textContent = '+' + cfg.pct2 + '%';
-    $('pct2-lbl').textContent = '+' + cfg.pct2 + '%';
-    $('pct2b-lbl').textContent = '+' + cfg.pct2 + '%';
+function adjPct(pass, d){
+  if(pass===2){
+    cfg.pct2 = Math.max(5, Math.min(100, cfg.pct2+d));
+    $('pct2-val').textContent = '+'+cfg.pct2+'%';
   } else {
-    cfg.pct3 = Math.max(cfg.pct2+5, Math.min(150, cfg.pct3 + delta));
-    $('pct3-val').textContent = '+' + cfg.pct3 + '%';
-    $('pct3-lbl').textContent = '+' + cfg.pct3 + '%';
+    cfg.pct3 = Math.max(cfg.pct2+5, Math.min(150, cfg.pct3+d));
+    $('pct3-val').textContent = '+'+cfg.pct3+'%';
   }
-  updateConfigPreviews();
+  updatePreviews();
 }
 
-function updateConfigPreviews() {
-  const bw = wordsForMinutes(cfg.ppm, cfg.blockMin);
-  $('block-words-preview').textContent = `≈ ${bw} palabras por bloque`;
+function updatePreviews(){
+  const bw = Math.round(cfg.ppm * cfg.blockMin);
+  $('block-preview').textContent = '≈ '+bw+' palabras por bloque';
   const p2 = Math.round(cfg.ppm*(1+cfg.pct2/100));
   const p3 = Math.round(cfg.ppm*(1+cfg.pct3/100));
-  $('pass2-speed-preview').textContent = `${cfg.ppm} → ${p2} ppm`;
-  $('pass3-speed-preview').textContent = `${cfg.ppm} → ${p3} ppm`;
-
-  // Session time estimate
-  if (words.length > 0 && cfg.mode === 'train') {
-    const total = words.length;
-    const t1 = total/cfg.ppm*60;
-    const numBlocks = Math.ceil(total/bw);
-    const pauseTime = (numBlocks-1)*cfg.pauseSec;
-    let totalTime = t1 + pauseTime;
-    let desc = `Opción ${cfg.trainMode}: ≈`;
-    if (cfg.trainMode >= 2) {
-      const t2 = total/p2*60;
-      totalTime += t2 + pauseTime + cfg.pauseSec;
-    }
-    if (cfg.trainMode >= 3) {
-      const t3 = total/p3*60;
-      totalTime += t3 + pauseTime + cfg.pauseSec;
-    }
-    $('session-preview').textContent = desc + ' ' + formatTime(totalTime) + ' en total para este texto';
+  $('p2-preview').textContent = cfg.ppm+' → '+p2+' ppm';
+  $('p3-preview').textContent = cfg.ppm+' → '+p3+' ppm';
+  ['b2a','b2b'].forEach(id=>{ if($(id)) $(id).textContent='×1 +'+cfg.pct2+'%'; });
+  ['b3a'].forEach(id=>{ if($(id)) $(id).textContent='×1 +'+cfg.pct3+'%'; });
+  if(words.length && cfg.mode==='train'){
+    const n = words.length;
+    const numBlk = Math.ceil(n/bw);
+    const pTotal = (numBlk-1)*cfg.pauseSec;
+    let t = n/cfg.ppm*60 + pTotal;
+    if(cfg.trainMode>=2) t += n/p2*60 + pTotal + cfg.pauseSec;
+    if(cfg.trainMode>=3) t += n/p3*60 + pTotal + cfg.pauseSec;
+    $('sess-est').textContent = 'Duración estimada: ≈ '+fmt(t);
   } else {
-    if ($('session-preview')) $('session-preview').textContent = '';
+    $('sess-est').textContent = '';
   }
 }
 
-// ── TEXT LOADING ──────────────────────────────────────────────────────────────
-const pasteInput = $('paste-input');
-pasteInput.addEventListener('input', () => {
-  words = tokenize(pasteInput.value);
+// ─────────────────────────────────────────────────────────────────────────────
+// FILE / TEXT LOADING
+// ─────────────────────────────────────────────────────────────────────────────
+const pasteEl = $('paste-input');
+pasteEl.addEventListener('input', ()=>{
+  words = tokenize(pasteEl.value);
   const chip = $('word-chip'), btn = $('btn-start');
-  if (words.length > 0) {
-    chip.textContent = words.length + ' palabras detectadas';
+  if(words.length){
+    chip.textContent = words.length+' palabras detectadas';
     chip.className = 'word-chip ready';
     btn.disabled = false;
   } else {
-    chip.textContent = ''; chip.className = 'word-chip'; btn.disabled = true;
+    chip.textContent = ''; chip.className='word-chip'; btn.disabled=true;
   }
-  updateConfigPreviews();
+  updatePreviews();
 });
 
-function openFile() { $('file-input').click(); }
-function loadFile(e) {
-  const file = e.target.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => { pasteInput.value = ev.target.result; pasteInput.dispatchEvent(new Event('input')); };
-  reader.readAsText(file, 'utf-8');
+function openFile(){ $('file-input').click(); }
+function loadFile(e){
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ev=>{ pasteEl.value=ev.target.result; pasteEl.dispatchEvent(new Event('input')); };
+  r.readAsText(f,'utf-8');
 }
-function loadDemo() { pasteInput.value = DEMO; pasteInput.dispatchEvent(new Event('input')); }
+function loadDemo(){ pasteEl.value=DEMO; pasteEl.dispatchEvent(new Event('input')); }
 
-// ── SCREEN NAV ────────────────────────────────────────────────────────────────
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+// ─────────────────────────────────────────────────────────────────────────────
+// SCREEN NAV
+// ─────────────────────────────────────────────────────────────────────────────
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   $(id).classList.add('active');
 }
-function showLoad() { stopAll(); showScreen('screen-load'); }
-function goBack()   { stopAll(); showScreen('screen-load'); }
+function showLoad(){ stopAll(); showScreen('screen-load'); }
+function goBack(){   stopAll(); showScreen('screen-load'); }
 
-// ── SESSION START ─────────────────────────────────────────────────────────────
-function startSession() {
-  words = tokenize(pasteInput.value);
-  if (!words.length) return;
-  session = buildSession();
-  startTime = Date.now();
+// ─────────────────────────────────────────────────────────────────────────────
+// SESSION BUILD
+// ─────────────────────────────────────────────────────────────────────────────
+function startSession(){
+  words = tokenize(pasteEl.value);
+  if(!words.length) return;
+
+  const spds = [cfg.ppm];
+  if(cfg.mode==='train' && cfg.trainMode>=2) spds.push(Math.round(cfg.ppm*(1+cfg.pct2/100)));
+  if(cfg.mode==='train' && cfg.trainMode>=3) spds.push(Math.round(cfg.ppm*(1+cfg.pct3/100)));
+
+  passes   = spds.map(p=>({ ppm:p, blocks:makeBlocks(p) }));
+  passIdx  = 0;
+  blockIdx = 0;
+  wordIdx  = 0;
+  running  = false;
+  inPause  = false;
+  sessionStart = Date.now();
+
   showScreen('screen-reader');
-  setupPassUI();
-  renderWord();
-  updateReaderStats();
+  setupPassDots();
+  updateReaderUI();
+  showWord();
 }
 
-function setupPassUI() {
-  const passes = session.passes.length;
-  const isTraining = cfg.mode === 'train' && passes > 1;
-  $('pass-indicator').style.display = isTraining ? 'flex' : 'none';
-  ['dot-1','dot-2','dot-3'].forEach((id,i) => {
-    $(id).style.display = i < passes ? 'inline-block' : 'none';
-    $(id).className = 'pass-dot';
+// ─────────────────────────────────────────────────────────────────────────────
+// READER UI
+// ─────────────────────────────────────────────────────────────────────────────
+function setupPassDots(){
+  const n = passes.length;
+  const show = cfg.mode==='train' && n>1;
+  $('pass-row').style.display = show ? 'flex' : 'none';
+  ['pd1','pd2','pd3'].forEach((id,i)=>{
+    $(id).style.display = i<n ? 'inline-block':'none';
   });
-  updatePassUI();
+  refreshPassDots();
 }
 
-function updatePassUI() {
-  const p = session.currentPass;
-  const passes = session.passes;
-  ['dot-1','dot-2','dot-3'].forEach((id,i) => {
-    const el = $(id);
-    if (i < p) el.className = 'pass-dot done';
-    else if (i === p) el.className = 'pass-dot active';
-    else el.className = 'pass-dot';
+function refreshPassDots(){
+  ['pd1','pd2','pd3'].forEach((id,i)=>{
+    const el=$(id);
+    if(i<passIdx)       el.className='pdot done';
+    else if(i===passIdx) el.className='pdot active';
+    else                 el.className='pdot';
   });
-  const labels = ['1ª lectura','2ª lectura — rápida','3ª lectura — máxima'];
-  $('pass-label-txt').textContent = passes.length > 1 ? labels[p] : '';
-  const ppmNow = passes[p].ppm;
-  $('r-ppm').textContent = ppmNow;
-  $('r-lvl').textContent = levelLabel(ppmNow);
-  $('r-pass-label').textContent = passes.length > 1 ? (ppmNow + ' ppm') : '';
+  const labels=['1ª lectura','2ª lectura — rápida','3ª lectura — máxima'];
+  $('pass-txt').textContent = passes.length>1 ? labels[passIdx]||'' : '';
+  const ppm = passes[passIdx].ppm;
+  $('r-ppm').textContent  = ppm;
+  $('r-lvl').textContent  = lvl(ppm);
+  $('r-pass-spd').textContent = passes.length>1 ? ppm+' ppm' : '';
 }
 
-// ── RENDER WORD ───────────────────────────────────────────────────────────────
-function renderWord() {
-  const display = $('word-display'), orpTop = $('orp-top'), orpBot = $('orp-bot');
-  const idx = session.idx;
-  if (idx >= words.length) {
-    display.innerHTML = '<span class="word-idle">✓ Fin</span>';
-    orpTop.style.opacity = '0'; orpBot.style.opacity = '0';
+function updateReaderUI(){
+  const total = words.length;
+  const pct   = total ? Math.round(wordIdx/total*100) : 0;
+  $('r-idx').textContent  = wordIdx;
+  $('r-total').textContent = total;
+  $('r-pct').textContent  = pct;
+  $('r-prog').style.width = pct+'%';
+}
+
+function showWord(){
+  if(wordIdx >= words.length){
+    $('word-disp').innerHTML = '<span class="word-idle">✓ Fin</span>';
+    $('orp-top').style.opacity='0'; $('orp-bot').style.opacity='0';
     return;
   }
-  const word = words[idx];
-  const orp = getORP(word);
-  display.innerHTML =
-    `<span>${word.slice(0,orp)}</span>` +
-    `<span class="word-pivot">${word.slice(orp,orp+1)}</span>` +
-    `<span>${word.slice(orp+1)}</span>`;
-  const boxW = $('word-box').offsetWidth;
-  const charW = 22;
-  const wordPx = word.length * charW;
-  const startPx = (boxW - wordPx) / 2;
-  const pivotPct = Math.round((startPx + orp*charW + charW/2) / boxW * 100);
-  [orpTop, orpBot].forEach(el => {
-    el.style.left = pivotPct + '%';
-    el.style.transform = 'translateX(-50%)';
-    el.style.opacity = '1';
+  const w   = words[wordIdx];
+  const o   = orp(w);
+  $('word-disp').innerHTML =
+    '<span>'+w.slice(0,o)+'</span>'+
+    '<span class="word-pivot">'+w.slice(o,o+1)+'</span>'+
+    '<span>'+w.slice(o+1)+'</span>';
+
+  // Position ORP markers
+  const bw = $('word-box').offsetWidth;
+  const cw = 22; // approx char width px
+  const sx = (bw - w.length*cw)/2;
+  const px = Math.round((sx + o*cw + cw/2)/bw*100);
+  [$('orp-top'),$('orp-bot')].forEach(el=>{
+    el.style.left=px+'%'; el.style.transform='translateX(-50%)'; el.style.opacity='1';
   });
-  updateReaderStats();
+  updateReaderUI();
 }
 
-function updateReaderStats() {
-  if (!session) return;
-  const pass = session.passes[session.currentPass];
-  const total = words.length;
-  const idx = session.idx;
-  const pct = total ? Math.round(idx/total*100) : 0;
-  $('r-idx').textContent = idx;
-  $('r-total').textContent = total;
-  $('r-pct').textContent = pct;
-  $('r-progress').style.width = pct + '%';
-}
-
-// ── PLAY / PAUSE ──────────────────────────────────────────────────────────────
-function togglePlay() {
-  if (session.phase === 'pause') { skipPause(); return; }
-  if (playing) stopReading(); else startReading();
-}
-
-function getWordDelay(word, basePpm) {
-  const base = Math.round(60000 / basePpm);
-  if (!cfg.microPauses) return base;
-  // Check trailing punctuation of current word
-  if (/[\n]{2}/.test(word) || word.endsWith('\n')) return Math.round(base * cfg.mpParagraph);
-  if (/[.!?]['"»)\]]*$/.test(word)) return Math.round(base * cfg.mpPeriod);
-  if (/[,;:]['"»)\]]*$/.test(word)) return Math.round(base * cfg.mpComma);
-  return base;
-}
-
-function scheduleNext() {
-  if (!playing) return;
-  const ppm = session.passes[session.currentPass].ppm;
-  // Delay is based on the word currently displayed
-  const currentWord = words[session.idx] || '';
-  const delay = getWordDelay(currentWord, ppm);
-  readTimer = setTimeout(() => {
-    if (!playing) return;
-    session.idx++;
-    if (session.idx >= words.length) { checkBlockEnd(); return; }
-    renderWord();
-    checkBlockEnd();
-    if (playing) scheduleNext();
+// ─────────────────────────────────────────────────────────────────────────────
+// PLAY ENGINE  (simple: show word → set timeout for next)
+// ─────────────────────────────────────────────────────────────────────────────
+function scheduleNextWord(){
+  if(!running) return;
+  const w = words[wordIdx] || '';
+  const ppm = passes[passIdx].ppm;
+  const delay = wordDelay(w, ppm);
+  wordTimer = setTimeout(()=>{
+    if(!running) return;
+    wordIdx++;
+    if(wordIdx >= words.length){
+      // end of pass
+      onPassEnd();
+      return;
+    }
+    // Check block boundary
+    const blk = passes[passIdx].blocks[blockIdx];
+    if(blk && wordIdx >= blk.end){
+      blockIdx++;
+      const isLastBlock = blockIdx >= passes[passIdx].blocks.length;
+      if(isLastBlock){
+        onPassEnd();
+      } else {
+        showWord();
+        if(cfg.mode==='train'){
+          running=false; setPlayUI(false);
+          beginPause('Pausa — descansa la vista', '', ()=>{ running=true; setPlayUI(true); scheduleNextWord(); });
+        } else {
+          scheduleNextWord();
+        }
+      }
+      return;
+    }
+    showWord();
+    scheduleNextWord();
   }, delay);
 }
 
-function startReading() {
-  if (session.idx >= words.length) { session.idx = 0; }
-  playing = true;
-  $('play-icon').textContent = '⏸';
-  $('play-label').textContent = 'Pausar';
-  renderWord();      // show current word immediately
-  scheduleNext();    // then schedule advance
-}
-
-function stopReading() {
-  playing = false;
-  clearTimeout(readTimer); readTimer = null;
-  $('play-icon').textContent = '▶';
-  $('play-label').textContent = 'Continuar';
-}
-
-function stopAll() {
-  stopReading();
-  clearInterval(pauseTimer); pauseTimer = null;
-  hidePauseOverlay();
-  playing = false;
-}
-
-// ── BLOCK / PASS LOGIC ────────────────────────────────────────────────────────
-function checkBlockEnd() {
-  const pass = session.passes[session.currentPass];
-  const block = pass.blocks[session.currentBlock];
-  if (!block) { checkPassEnd(); return; }
-
-  if (session.idx >= block.end) {
-    // End of block
-    session.currentBlock++;
-    const isLastBlock = session.currentBlock >= pass.blocks.length;
-    if (isLastBlock) {
-      checkPassEnd();
-    } else {
-      // Pause between blocks
-      stopReading();
-      startPause('block', () => startReading());
-    }
-  }
-}
-
-function checkPassEnd() {
-  const isLastPass = session.currentPass >= session.passes.length - 1;
-  if (isLastPass) {
-    stopAll();
+function onPassEnd(){
+  clearTimeout(wordTimer); wordTimer=null;
+  running=false; setPlayUI(false);
+  if(passIdx >= passes.length-1){
     showDone();
   } else {
-    stopReading();
-    session.currentPass++;
-    session.currentBlock = 0;
-    session.idx = 0;
-    updatePassUI();
-    const label = ['','2ª lectura — velocidad +' + cfg.pct2 + '%','3ª lectura — velocidad +' + cfg.pct3 + '%'];
-    startPause('pass', () => { renderWord(); updateReaderStats(); startReading(); },
-      label[session.currentPass]);
+    passIdx++;
+    blockIdx=0;
+    wordIdx=0;
+    refreshPassDots();
+    const label = ['','2ª lectura — velocidad +'+cfg.pct2+'%','3ª lectura — velocidad +'+cfg.pct3+'%'];
+    beginPause('Preparando siguiente pasada', label[passIdx]||'', ()=>{
+      showWord();
+      running=true; setPlayUI(true);
+      scheduleNextWord();
+    });
   }
 }
 
-// ── PAUSE OVERLAY ─────────────────────────────────────────────────────────────
-let pauseCallback = null;
-let pauseRemaining = 0;
-const ARC_LEN = 213.6;
+function togglePlay(){
+  if(inPause){ skipPause(); return; }
+  if(running){ pauseReading(); } else { resumeReading(); }
+}
 
-function startPause(type, callback, subtitle) {
-  if (cfg.mode === 'libre') { callback(); return; } // no pauses in libre mode
-  session.phase = 'pause';
-  session.pauseType = type;
-  pauseCallback = callback;
-  pauseRemaining = cfg.pauseSec;
-  $('pause-title').textContent = type === 'pass' ? 'Preparando siguiente lectura…' : 'Pausa — descansa la vista';
-  $('pause-sub').textContent = subtitle || '';
-  $('word-box').classList.add('dimmed');
-  $('pause-overlay').classList.remove('hidden');
-  $('play-icon').textContent = '⏭';
-  $('play-label').textContent = 'Saltar';
+function resumeReading(){
+  if(wordIdx>=words.length) return;
+  running=true; setPlayUI(true);
+  scheduleNextWord();
+}
+
+function pauseReading(){
+  running=false;
+  clearTimeout(wordTimer); wordTimer=null;
+  setPlayUI(false);
+}
+
+function stopAll(){
+  running=false; inPause=false;
+  clearTimeout(wordTimer); wordTimer=null;
+  clearInterval(pauseTimer); pauseTimer=null;
+  pauseCb=null;
+  hidePauseOv();
+  setPlayUI(false);
+}
+
+function setPlayUI(isPlaying){
+  $('play-ic').textContent  = isPlaying ? '⏸' : '▶';
+  $('play-lbl').textContent = isPlaying ? 'Pausar' : (wordIdx>0?'Continuar':'Iniciar');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PAUSE OVERLAY
+// ─────────────────────────────────────────────────────────────────────────────
+const ARC = 201;
+function beginPause(title, sub, cb){
+  inPause=true; pauseCb=cb; pauseLeft=cfg.pauseSec;
+  $('pov-title').textContent = title;
+  $('pov-sub').textContent   = sub;
+  $('pause-ov').classList.remove('hidden');
+  $('play-ic').textContent='⏭'; $('play-lbl').textContent='Saltar';
   tickPause();
-  pauseTimer = setInterval(tickPause, 1000);
+  pauseTimer=setInterval(tickPause,1000);
 }
 
-function tickPause() {
-  $('pause-num').textContent = pauseRemaining;
-  const fraction = pauseRemaining / cfg.pauseSec;
-  $('pause-arc').setAttribute('stroke-dashoffset', ARC_LEN * (1 - fraction));
-  if (pauseRemaining <= 0) endPause();
-  else pauseRemaining--;
+function tickPause(){
+  $('pov-num').textContent = pauseLeft;
+  $('parc').setAttribute('stroke-dashoffset', ARC*(1-pauseLeft/cfg.pauseSec));
+  if(pauseLeft<=0){ endPause(); return; }
+  pauseLeft--;
 }
 
-function endPause() {
-  clearInterval(pauseTimer); pauseTimer = null;
-  hidePauseOverlay();
-  session.phase = 'reading';
-  if (pauseCallback) { const cb = pauseCallback; pauseCallback = null; cb(); }
+function endPause(){
+  clearInterval(pauseTimer); pauseTimer=null;
+  hidePauseOv();
+  inPause=false;
+  if(pauseCb){ const cb=pauseCb; pauseCb=null; cb(); }
 }
 
-function skipPause() { pauseRemaining = 0; endPause(); }
+function skipPause(){ pauseLeft=0; endPause(); }
 
-function hidePauseOverlay() {
-  $('pause-overlay').classList.add('hidden');
-  $('word-box').classList.remove('dimmed');
-  $('play-icon').textContent = '⏸';
-  $('play-label').textContent = 'Pausar';
+function hidePauseOv(){
+  $('pause-ov').classList.add('hidden');
 }
 
-// ── SPEED CHANGE IN READER ────────────────────────────────────────────────────
-function changeSpeed(delta) {
-  cfg.ppm = Math.min(1000, Math.max(50, cfg.ppm + delta));
-  // Update current pass speed (libre mode only; training speeds are locked)
-  if (cfg.mode === 'libre' && session) session.passes[0].ppm = cfg.ppm;
-  $('r-ppm').textContent = session ? session.passes[session.currentPass].ppm : cfg.ppm;
-  $('r-lvl').textContent = levelLabel(cfg.ppm);
-  if (playing) { stopReading(); startReading(); }
+// ─────────────────────────────────────────────────────────────────────────────
+// SPEED IN READER
+// ─────────────────────────────────────────────────────────────────────────────
+function chgSpd(d){
+  cfg.ppm = Math.min(1000, Math.max(50, cfg.ppm+d));
+  if(cfg.mode==='libre' && passes[passIdx]) passes[passIdx].ppm = cfg.ppm;
+  const ppm = passes[passIdx] ? passes[passIdx].ppm : cfg.ppm;
+  $('r-ppm').textContent = ppm; $('r-lvl').textContent=lvl(ppm);
+  if(running){ clearTimeout(wordTimer); scheduleNextWord(); }
 }
 
-function restartSession() {
+// ─────────────────────────────────────────────────────────────────────────────
+// RESTART
+// ─────────────────────────────────────────────────────────────────────────────
+function restartSession(){
   stopAll();
-  session = buildSession();
-  setupPassUI();
-  renderWord();
-  updateReaderStats();
-  $('play-icon').textContent = '▶';
-  $('play-label').textContent = 'Iniciar';
+  passIdx=0; blockIdx=0; wordIdx=0;
+  passes = passes.map((p,i)=>({ ppm:p.ppm, blocks:makeBlocks(p.ppm) }));
+  refreshPassDots();
+  showWord();
+  updateReaderUI();
+  setPlayUI(false);
 }
 
-// ── DONE ──────────────────────────────────────────────────────────────────────
-function showDone() {
-  const elapsed = Math.round((Date.now() - startTime) / 1000);
-  const modeNames = ['—','Lectura libre','Bloques con pausa','Double over-speed','Triple over-speed'];
-  const trainNames = {1:'Bloques con pausa', 2:'Double over-speed', 3:'Triple over-speed'};
-  $('d-words').textContent = words.length;
-  $('d-mode').textContent = cfg.mode === 'libre' ? 'Lectura libre' : trainNames[cfg.trainMode];
-  $('d-ppm').textContent = cfg.ppm + ' ppm';
-  $('d-time').textContent = formatTime(elapsed);
-  $('d-passes').textContent = session.passes.length + (session.passes.length>1?' pasadas':' pasada');
+// ─────────────────────────────────────────────────────────────────────────────
+// DONE
+// ─────────────────────────────────────────────────────────────────────────────
+function showDone(){
+  const elapsed = Math.round((Date.now()-sessionStart)/1000);
+  const modeStr = cfg.mode==='libre' ? 'Lectura libre' :
+    ['','Con pausas','Over-speed ×2','Over-speed ×3'][cfg.trainMode]||'—';
+  $('d-words').textContent   = words.length;
+  $('d-mode').textContent    = modeStr;
+  $('d-ppm').textContent     = cfg.ppm+' ppm';
+  $('d-time').textContent    = fmt(elapsed);
+  $('d-passes').textContent  = passes.length+(passes.length>1?' pasadas':' pasada');
   showScreen('screen-done');
 }
 
-// ── PWA ───────────────────────────────────────────────────────────────────────
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
-const sp = new URLSearchParams(window.location.search);
-const sharedText = sp.get('text') || sp.get('title');
-if (sharedText) { pasteInput.value = sharedText; pasteInput.dispatchEvent(new Event('input')); }
-
-// Init
-updateConfigPreviews();
+// ─────────────────────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────────────────────
+$('row-pct3').style.display='none';
+updatePreviews();
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+const sp=new URLSearchParams(location.search);
+const st=sp.get('text')||sp.get('title');
+if(st){ pasteEl.value=st; pasteEl.dispatchEvent(new Event('input')); }
 </script>
 </body>
 </html>
