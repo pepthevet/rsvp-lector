@@ -10,13 +10,13 @@
 <meta name="theme-color" content="#0a0a0a">
 <title>RSVP Lector</title>
 <style>
-:root {
-  --bg:#0a0a0a; --surface:#141414; --surface2:#1c1c1c;
-  --border:#2a2a2a; --border2:#333;
-  --accent:#e8ff47; --accent-dk:#b8cc1a;
-  --text:#f0f0f0; --muted:#666;
-  --box-bg:#ffffff; --box-red:#cc1a1a;
-  --green:#1db954; --orange:#ff8c00; --purple:#9b59b6;
+:root{
+  --bg:#0a0a0a;--surface:#141414;--surface2:#1c1c1c;
+  --border:#2a2a2a;--border2:#333;
+  --accent:#e8ff47;--accent-dk:#b8cc1a;
+  --text:#f0f0f0;--muted:#666;--muted2:#444;
+  --box-bg:#fff;--box-red:#cc1a1a;
+  --green:#1db954;--orange:#ff8c00;--purple:#9b59b6;
   --r:12px;
   --safe-top:env(safe-area-inset-top,0px);
   --safe-bot:env(safe-area-inset-bottom,0px);
@@ -25,76 +25,120 @@
 html,body{height:100%;background:var(--bg);color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;
   -webkit-tap-highlight-color:transparent;overscroll-behavior:none;user-select:none}
-
 .screen{display:none;flex-direction:column;height:100%;
   padding-top:var(--safe-top);padding-bottom:var(--safe-bot)}
 .screen.active{display:flex}
 
-/* ── LOAD ── */
-#screen-load{padding:18px 18px;gap:12px;overflow-y:auto}
-.app-title{font-size:22px;font-weight:700;letter-spacing:-.5px;color:var(--accent)}
-.app-sub{font-size:13px;color:var(--muted);margin-top:2px}
+/* ── SHARED ── */
 .section-label{font-size:11px;font-weight:600;letter-spacing:.08em;
   text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-.paste-area{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
-  padding:12px;min-height:100px;font-size:16px;color:var(--text);line-height:1.5;
-  outline:none;resize:none;width:100%;font-family:inherit;
-  -webkit-user-select:text;user-select:text}
-.paste-area:focus{border-color:var(--accent)}
-.paste-area::placeholder{color:var(--muted)}
-.word-chip{font-size:12px;color:var(--muted);text-align:center;min-height:16px;margin-top:3px}
-.word-chip.ready{color:var(--accent)}
-.action-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.btn-action{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
-  padding:12px 10px;color:var(--text);font-size:14px;font-weight:500;
-  display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer}
-.btn-action:active{background:#222}
-.btn-action .icon{font-size:20px}
-.btn-action .lbl{color:var(--muted);font-size:12px;font-weight:400}
-
-/* Slider */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px}
-.slider-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
-.slider-top .val{font-size:24px;font-weight:700;color:var(--accent);letter-spacing:-1px}
-.slider-top .unit{font-size:13px;color:var(--muted)}
-.slider-top .lvl{font-size:12px;color:var(--muted)}
+.btn-accent{background:var(--accent);color:#111;border:none;border-radius:var(--r);
+  padding:15px;font-size:16px;font-weight:700;width:100%;cursor:pointer}
+.btn-accent:active{background:var(--accent-dk)}
+.btn-accent:disabled{background:var(--border);color:var(--muted)}
+.btn-ghost{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  color:var(--text);font-size:14px;font-weight:500;padding:12px;cursor:pointer;width:100%}
+.btn-ghost:active{background:var(--surface2)}
 input[type=range]{-webkit-appearance:none;width:100%;height:4px;
   background:var(--border);border-radius:2px;outline:none}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;
   border-radius:50%;background:var(--accent);cursor:pointer}
-
-/* Mode tabs */
-.mode-tabs{display:grid;grid-template-columns:1fr 1fr;gap:0;
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
-.mode-tab{padding:12px 8px;text-align:center;font-size:13px;font-weight:500;
-  color:var(--muted);cursor:pointer;border:none;background:none}
-.mode-tab.active{background:var(--accent);color:#111;font-weight:700}
-
-/* Stepper */
-.cfg-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0}
-.cfg-label{font-size:14px;color:var(--text)}
-.cfg-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.tgl{position:relative;display:inline-block;width:44px;height:26px;flex-shrink:0}
+.tgl input{opacity:0;width:0;height:0}
+.tgl-sl{position:absolute;inset:0;background:var(--border2);border-radius:26px;
+  transition:.3s;cursor:pointer}
+.tgl-sl:before{content:"";position:absolute;width:20px;height:20px;left:3px;bottom:3px;
+  background:#888;border-radius:50%;transition:.3s}
+.tgl input:checked+.tgl-sl{background:var(--accent)}
+.tgl input:checked+.tgl-sl:before{transform:translateX(18px);background:#111}
 .stepper{display:flex;align-items:center;background:var(--surface2);
   border:1px solid var(--border2);border-radius:8px;overflow:hidden}
 .stepper button{background:none;border:none;color:var(--text);font-size:20px;
-  width:38px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  width:38px;height:36px;cursor:pointer}
 .stepper button:active{background:var(--border)}
 .stepper span{font-size:14px;font-weight:600;min-width:52px;text-align:center;color:var(--accent)}
+.cfg-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0}
+.cfg-label{font-size:14px;color:var(--text)}
+.cfg-sub{font-size:11px;color:var(--muted);margin-top:1px}
 
-/* Toggle */
-.toggle-wrap{display:flex;align-items:center;justify-content:space-between;padding:6px 0}
-.toggle-label{font-size:14px;color:var(--text)}
-.toggle-sub{font-size:11px;color:var(--muted);margin-top:2px}
-.tgl{position:relative;display:inline-block;width:44px;height:26px;flex-shrink:0}
-.tgl input{opacity:0;width:0;height:0}
-.tgl-slider{position:absolute;inset:0;background:var(--border2);border-radius:26px;
-  transition:.3s;cursor:pointer}
-.tgl-slider:before{content:"";position:absolute;width:20px;height:20px;left:3px;bottom:3px;
-  background:#888;border-radius:50%;transition:.3s}
-.tgl input:checked+.tgl-slider{background:var(--accent)}
-.tgl input:checked+.tgl-slider:before{transform:translateX(18px);background:#111}
+/* ── HOME SCREEN ── */
+#screen-home{padding:0;overflow-y:auto}
+.home-header{padding:calc(var(--safe-top) + 16px) 18px 14px;
+  display:flex;align-items:center;justify-content:space-between}
+.app-title{font-size:22px;font-weight:700;letter-spacing:-.5px;color:var(--accent)}
+.app-sub{font-size:13px;color:var(--muted);margin-top:1px}
+.home-body{padding:0 18px 24px;display:flex;flex-direction:column;gap:14px}
 
-/* Train mode options */
+/* Continue reading banner */
+.continue-banner{background:var(--surface);border:1px solid var(--accent);
+  border-radius:var(--r);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer}
+.continue-banner:active{background:var(--surface2)}
+.cb-icon{font-size:28px;flex-shrink:0}
+.cb-text{flex:1;min-width:0}
+.cb-title{font-size:13px;font-weight:600;color:var(--accent)}
+.cb-sub{font-size:12px;color:var(--muted);margin-top:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cb-arrow{font-size:18px;color:var(--accent);flex-shrink:0}
+
+/* Load buttons */
+.load-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.load-btn{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer}
+.load-btn:active{background:var(--surface2)}
+.load-btn .ic{font-size:28px}
+.load-btn .lb{font-size:14px;font-weight:600;color:var(--text)}
+.load-btn .sb{font-size:11px;color:var(--muted)}
+
+/* Recent books */
+.recent-item{display:flex;align-items:center;gap:12px;padding:12px;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);cursor:pointer}
+.recent-item:active{background:var(--surface2)}
+.ri-icon{font-size:24px;flex-shrink:0}
+.ri-info{flex:1;min-width:0}
+.ri-title{font-size:14px;font-weight:500;color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ri-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.ri-prog{font-size:11px;color:var(--accent);margin-top:2px}
+.ri-del{background:none;border:none;color:var(--muted);font-size:18px;
+  padding:4px 8px;cursor:pointer;flex-shrink:0}
+
+/* Progress bar mini */
+.mini-prog{height:3px;background:var(--border);border-radius:2px;margin-top:5px;overflow:hidden}
+.mini-prog-fill{height:100%;background:var(--accent);border-radius:2px}
+
+/* Settings gear */
+.btn-settings{background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;padding:4px}
+
+/* ── CHAPTERS SCREEN ── */
+#screen-chapters{padding:0}
+.chapters-header{padding:calc(var(--safe-top)+14px) 18px 12px;
+  display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border)}
+.btn-back{background:none;border:none;color:var(--accent);
+  font-size:15px;font-weight:500;cursor:pointer;padding:4px 0;flex-shrink:0}
+.ch-header-info{flex:1;min-width:0}
+.ch-book-title{font-size:15px;font-weight:600;color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ch-book-sub{font-size:12px;color:var(--muted);margin-top:1px}
+.chapters-list{flex:1;overflow-y:auto;padding:12px 18px;display:flex;flex-direction:column;gap:8px}
+.chapter-item{display:flex;align-items:center;gap:12px;padding:13px 14px;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);cursor:pointer}
+.chapter-item:active{background:var(--surface2)}
+.chapter-item.current{border-color:var(--accent)}
+.chapter-item.done{opacity:.55}
+.ch-num{font-size:13px;font-weight:700;color:var(--muted);min-width:24px}
+.ch-info{flex:1;min-width:0}
+.ch-title{font-size:14px;font-weight:500;color:var(--text)}
+.ch-words{font-size:12px;color:var(--muted);margin-top:2px}
+.ch-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;flex-shrink:0}
+.ch-badge.current{background:#1a1f00;color:var(--accent)}
+.ch-badge.done{background:var(--surface2);color:var(--muted)}
+
+/* ── SETTINGS SCREEN ── */
+#screen-settings{padding:0;overflow-y:auto}
+.settings-header{padding:calc(var(--safe-top)+14px) 18px 12px;
+  display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border)}
+.settings-body{padding:18px;display:flex;flex-direction:column;gap:14px}
 .train-opts{display:flex;flex-direction:column;gap:8px}
 .train-opt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;
   background:var(--surface2);border:1px solid var(--border2);border-radius:10px;cursor:pointer}
@@ -107,225 +151,293 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 .b1{background:#1a3320;color:var(--green)}
 .b2{background:#2a1f00;color:var(--orange)}
 .b3{background:#1f1028;color:var(--purple)}
+.backup-row{display:flex;gap:10px}
+.backup-row button{flex:1}
 
-.btn-start{background:var(--accent);color:#111;border:none;border-radius:var(--r);
-  padding:16px;font-size:17px;font-weight:700;width:100%;cursor:pointer}
-.btn-start:active{background:var(--accent-dk)}
-.btn-start:disabled{background:var(--border);color:var(--muted)}
-.session-est{font-size:12px;color:var(--muted);text-align:center;padding:2px 0}
+/* ── CONFIG SCREEN (before reading) ── */
+#screen-config{padding:0;overflow-y:auto}
+.config-header{padding:calc(var(--safe-top)+14px) 18px 12px;
+  display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border)}
+.config-body{padding:18px;display:flex;flex-direction:column;gap:14px}
+.slider-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.slider-top .val{font-size:26px;font-weight:700;color:var(--accent);letter-spacing:-1px}
+.slider-top .unit{font-size:13px;color:var(--muted)}
+.slider-top .lvl{font-size:13px;color:var(--muted)}
+.mode-tabs{display:grid;grid-template-columns:1fr 1fr;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.mode-tab{padding:12px 8px;text-align:center;font-size:13px;font-weight:500;
+  color:var(--muted);cursor:pointer;border:none;background:none}
+.mode-tab.active{background:var(--accent);color:#111;font-weight:700}
+.sess-est{font-size:12px;color:var(--muted);text-align:center}
 
-/* ── READER ── */
+/* ── READER SCREEN ── */
 #screen-reader{justify-content:space-between}
-.reader-top{padding:calc(var(--safe-top) + 12px) 18px 8px;
+.reader-top{padding:calc(var(--safe-top)+10px) 18px 6px;
   display:flex;align-items:center;justify-content:space-between}
-.btn-back{background:none;border:none;color:var(--accent);font-size:15px;
-  font-weight:500;cursor:pointer}
 .reader-info{font-size:12px;color:var(--muted);text-align:right;line-height:1.6}
 .reader-info strong{color:var(--text)}
 .prog-track{height:2px;background:var(--border);margin:0 18px;border-radius:1px;overflow:hidden}
 .prog-fill{height:100%;background:var(--accent);border-radius:1px;width:0%;transition:width .15s}
-
-/* Pass dots */
-.pass-row{display:flex;align-items:center;justify-content:center;gap:8px;padding:7px 0}
+.pass-row{display:flex;align-items:center;justify-content:center;gap:8px;padding:6px 0}
 .pdot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all .3s}
 .pdot.active{background:var(--accent);transform:scale(1.3)}
-.pdot.done{background:var(--muted)}
+.pdot.done{background:var(--muted2)}
 .pass-txt{font-size:12px;color:var(--muted)}
-
-/* Word box */
-.word-stage{flex:1;display:flex;align-items:center;justify-content:center;padding:12px 18px}
+.word-stage{flex:1;display:flex;align-items:center;justify-content:center;padding:10px 18px}
 .word-box-wrap{position:relative;width:100%;max-width:360px}
 .word-box{background:var(--box-bg);border-radius:20px;width:100%;aspect-ratio:16/7;
   display:flex;align-items:center;justify-content:center;position:relative}
 .orp-top{position:absolute;top:10px;font-size:10px;color:#bbb;pointer-events:none}
 .orp-bot{position:absolute;bottom:10px;font-size:10px;color:#bbb;pointer-events:none}
-.word-disp{font-size:clamp(24px,7vw,38px);font-weight:700;color:#111;
+.word-disp{font-size:clamp(22px,6.5vw,36px);font-weight:700;color:#111;
   letter-spacing:-.5px;line-height:1;display:flex;align-items:baseline}
 .word-pivot{color:var(--box-red)}
-.word-idle{font-size:15px;color:#aaa;font-weight:400}
-
-/* Pause overlay */
+.word-idle{font-size:14px;color:#aaa;font-weight:400}
 .pause-ov{position:absolute;inset:0;border-radius:20px;
   background:rgba(10,10,10,.93);display:flex;flex-direction:column;
   align-items:center;justify-content:center;gap:6px;z-index:5}
 .pause-ov.hidden{display:none}
-.pause-ov-title{font-size:13px;color:var(--muted);font-weight:500}
-.pause-ring{position:relative;width:76px;height:76px}
+.pov-title{font-size:13px;color:var(--muted);font-weight:500}
+.pause-ring{position:relative;width:72px;height:72px}
 .pause-ring svg{transform:rotate(-90deg)}
-.pause-ring-num{position:absolute;inset:0;display:flex;align-items:center;
-  justify-content:center;font-size:26px;font-weight:700;color:var(--accent)}
-.pause-sub{font-size:11px;color:var(--muted);text-align:center;padding:0 12px}
-.btn-skip{margin-top:4px;background:none;border:1px solid var(--border2);
+.pring-num{position:absolute;inset:0;display:flex;align-items:center;
+  justify-content:center;font-size:24px;font-weight:700;color:var(--accent)}
+.pov-sub{font-size:11px;color:var(--muted);text-align:center;padding:0 10px}
+.btn-skip{margin-top:2px;background:none;border:1px solid var(--border2);
   border-radius:20px;color:var(--muted);font-size:12px;padding:5px 14px;cursor:pointer}
-
-/* Controls */
-.reader-ctrls{padding:0 18px calc(var(--safe-bot) + 18px);display:flex;flex-direction:column;gap:10px}
+.reader-ctrls{padding:0 18px calc(var(--safe-bot)+16px);display:flex;flex-direction:column;gap:8px}
 .speed-row{display:flex;align-items:center;gap:10px}
 .btn-spd{width:40px;height:40px;border-radius:50%;background:var(--surface);
   border:1px solid var(--border);color:var(--text);font-size:20px;
   display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
-.btn-spd:active{background:#222}
+.btn-spd:active{background:var(--surface2)}
 .speed-info{flex:1;text-align:center;font-size:13px;color:var(--muted)}
 .speed-info strong{color:var(--accent);font-size:16px}
 .ctrl-row{display:grid;grid-template-columns:1fr 2fr 1fr;gap:10px}
 .btn-ctrl{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
-  color:var(--text);font-size:12px;font-weight:500;padding:12px 8px;cursor:pointer;
-  display:flex;flex-direction:column;align-items:center;gap:4px}
-.btn-ctrl:active{background:#222}
+  color:var(--text);font-size:12px;font-weight:500;padding:11px 8px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:3px}
+.btn-ctrl:active{background:var(--surface2)}
 .btn-ctrl .ic{font-size:20px}
 .btn-play{background:var(--accent);border-color:var(--accent);color:#111}
 .btn-play:active{background:var(--accent-dk)}
 
 /* ── DONE ── */
-#screen-done{align-items:center;justify-content:center;gap:16px;padding:32px 22px}
-.done-icon{font-size:52px}
-.done-title{font-size:24px;font-weight:700;color:var(--accent)}
+#screen-done{align-items:center;justify-content:center;gap:14px;padding:28px 22px}
+.done-icon{font-size:50px}
+.done-title{font-size:22px;font-weight:700;color:var(--accent)}
 .done-stats{background:var(--surface);border:1px solid var(--border);
   border-radius:var(--r);width:100%;overflow:hidden}
-.done-row{display:flex;justify-content:space-between;padding:12px 16px;
+.done-row{display:flex;justify-content:space-between;padding:11px 16px;
   font-size:14px;border-bottom:1px solid var(--border)}
 .done-row:last-child{border-bottom:none}
 .done-row span{color:var(--muted)}
 .done-row strong{color:var(--text)}
-.btn-again{background:var(--accent);color:#111;border:none;border-radius:var(--r);
-  padding:15px;font-size:16px;font-weight:700;cursor:pointer;width:100%}
-#file-input{display:none}
+.done-btns{display:flex;flex-direction:column;gap:10px;width:100%}
+
+#file-input,#epub-input,#import-input{display:none}
 </style>
 </head>
 <body>
 
-<!-- ── LOAD ── -->
-<div id="screen-load" class="screen active">
-  <div style="padding-top:6px">
-    <div class="app-title">RSVP Lector</div>
-    <div class="app-sub">Entrena tu lectura rápida</div>
+<!-- ── HOME ── -->
+<div id="screen-home" class="screen active">
+  <div class="home-header">
+    <div><div class="app-title">RSVP Lector</div><div class="app-sub">Entrena tu lectura rápida</div></div>
+    <button class="btn-settings" onclick="showSettings()" title="Ajustes">⚙️</button>
   </div>
-
-  <div>
-    <div class="section-label">Texto</div>
-    <textarea id="paste-input" class="paste-area" placeholder="Pega aquí cualquier texto…" rows="4"></textarea>
-    <div class="word-chip" id="word-chip"></div>
-  </div>
-
-  <div class="action-row">
-    <button class="btn-action" onclick="openFile()">
-      <span class="icon">📄</span><span>Fichero .txt</span><span class="lbl">desde Archivos</span>
-    </button>
-    <button class="btn-action" onclick="loadDemo()">
-      <span class="icon">🎯</span><span>Texto demo</span><span class="lbl">para probar</span>
-    </button>
-  </div>
-  <input type="file" id="file-input" accept=".txt,text/plain" onchange="loadFile(event)">
-
-  <div>
-    <div class="section-label">Velocidad base</div>
-    <div class="card">
-      <div class="slider-top">
-        <div><span class="val" id="spd-val">250</span> <span class="unit">ppm</span></div>
-        <div class="lvl" id="spd-lvl">Promedio</div>
+  <div class="home-body">
+    <!-- Continue banner (hidden if no saved position) -->
+    <div id="continue-banner" class="continue-banner" style="display:none" onclick="continueReading()">
+      <div class="cb-icon">📖</div>
+      <div class="cb-text">
+        <div class="cb-title">Continuar leyendo</div>
+        <div class="cb-sub" id="cb-sub">—</div>
       </div>
-      <input type="range" id="spd-slider" min="100" max="700" step="10" value="250"
-             oninput="onSpeedSlider(this.value)">
-    </div>
-  </div>
-
-  <div>
-    <div class="section-label">Modo</div>
-    <div class="mode-tabs">
-      <button class="mode-tab active" id="tab-libre" onclick="setMode('libre')">📖 Lectura libre</button>
-      <button class="mode-tab" id="tab-train" onclick="setMode('train')">🏋 Entrenamiento</button>
-    </div>
-  </div>
-
-  <!-- Micro-pauses (both modes) -->
-  <div class="card">
-    <div class="toggle-wrap">
-      <div><div class="toggle-label">Micro-pausas en puntuación</div>
-        <div class="toggle-sub">Coma ×1.5 · Punto ×2.5 · Párrafo ×4</div></div>
-      <label class="tgl"><input type="checkbox" id="mp-chk" checked onchange="cfg.microPauses=this.checked">
-        <span class="tgl-slider"></span></label>
-    </div>
-  </div>
-
-  <!-- Train panel -->
-  <div id="train-panel" style="display:none;flex-direction:column;gap:12px">
-    <div class="card" style="display:flex;flex-direction:column;gap:4px">
-      <div class="cfg-row">
-        <div><div class="cfg-label">Duración del bloque</div>
-          <div class="cfg-sub" id="block-preview">≈ 500 palabras</div></div>
-        <div class="stepper">
-          <button onclick="adjBlock(-0.5)">−</button>
-          <span id="block-val">2.0 min</span>
-          <button onclick="adjBlock(+0.5)">+</button>
-        </div>
-      </div>
-      <div class="cfg-row">
-        <div><div class="cfg-label">Pausa entre bloques</div></div>
-        <div class="stepper">
-          <button onclick="adjPause(-5)">−</button>
-          <span id="pause-val">25 seg</span>
-          <button onclick="adjPause(+5)">+</button>
-        </div>
-      </div>
+      <div class="cb-arrow">›</div>
     </div>
 
     <div>
-      <div class="section-label">Modo de repetición</div>
-      <div class="train-opts">
-        <label class="train-opt sel">
-          <input type="radio" name="trm" value="1" checked onchange="setTrainMode(1)">
-          <div><div class="train-opt-title">Una lectura con pausas</div>
-            <div class="train-opt-desc">Velocidad base con descansos cada bloque.</div>
-            <div class="badges"><span class="badge b1">×1</span></div></div>
-        </label>
-        <label class="train-opt">
-          <input type="radio" name="trm" value="2" onchange="setTrainMode(2)">
-          <div><div class="train-opt-title">Doble lectura — Over-Speed</div>
-            <div class="train-opt-desc">Base + segunda pasada más rápida para fijar.</div>
-            <div class="badges"><span class="badge b1">×1 normal</span>
-              <span class="badge b2" id="b2a">×1 +30%</span></div></div>
-        </label>
-        <label class="train-opt">
-          <input type="radio" name="trm" value="3" onchange="setTrainMode(3)">
-          <div><div class="train-opt-title">Triple lectura — Over-Speed máximo</div>
-            <div class="train-opt-desc">Máxima mejora de velocidad y retención.</div>
-            <div class="badges"><span class="badge b1">×1 normal</span>
-              <span class="badge b2" id="b2b">×1 +30%</span>
-              <span class="badge b3" id="b3a">×1 +50%</span></div></div>
-        </label>
+      <div class="section-label">Cargar libro</div>
+      <div class="load-grid">
+        <button class="load-btn" onclick="document.getElementById('epub-input').click()">
+          <span class="ic">📚</span><span class="lb">EPUB</span><span class="sb">libro digital</span>
+        </button>
+        <button class="load-btn" onclick="document.getElementById('file-input').click()">
+          <span class="ic">📄</span><span class="lb">TXT</span><span class="sb">texto plano</span>
+        </button>
       </div>
+      <input type="file" id="epub-input" accept=".epub,application/epub+zip" onchange="loadEpub(event)">
+      <input type="file" id="file-input" accept=".txt,text/plain" onchange="loadTxt(event)">
     </div>
 
-    <div class="card" style="display:flex;flex-direction:column;gap:4px">
-      <div class="cfg-row">
-        <div><div class="cfg-label">Incremento 2ª lectura</div>
-          <div class="cfg-sub" id="p2-preview">250 → 325 ppm</div></div>
-        <div class="stepper">
-          <button onclick="adjPct(2,-5)">−</button>
-          <span id="pct2-val">+30%</span>
-          <button onclick="adjPct(2,+5)">+</button>
-        </div>
-      </div>
-      <div class="cfg-row" id="row-pct3">
-        <div><div class="cfg-label">Incremento 3ª lectura</div>
-          <div class="cfg-sub" id="p3-preview">250 → 375 ppm</div></div>
-        <div class="stepper">
-          <button onclick="adjPct(3,-5)">−</button>
-          <span id="pct3-val">+50%</span>
-          <button onclick="adjPct(3,+5)">+</button>
-        </div>
-      </div>
+    <div id="recent-section" style="display:none">
+      <div class="section-label">Biblioteca</div>
+      <div id="recent-list" style="display:flex;flex-direction:column;gap:8px"></div>
     </div>
-    <div class="session-est" id="sess-est"></div>
+
+    <button class="btn-ghost" onclick="loadDemo()">🎯 Cargar texto demo</button>
   </div>
+</div>
 
-  <button class="btn-start" id="btn-start" onclick="startSession()" disabled>Iniciar</button>
+<!-- ── CHAPTERS ── -->
+<div id="screen-chapters" class="screen">
+  <div class="chapters-header">
+    <button class="btn-back" onclick="showHome()">←</button>
+    <div class="ch-header-info">
+      <div class="ch-book-title" id="ch-book-title">—</div>
+      <div class="ch-book-sub" id="ch-book-sub">—</div>
+    </div>
+  </div>
+  <div class="chapters-list" id="chapters-list"></div>
+</div>
+
+<!-- ── CONFIG ── -->
+<div id="screen-config" class="screen">
+  <div class="config-header">
+    <button class="btn-back" onclick="showChapters()">←</button>
+    <div style="flex:1">
+      <div style="font-size:15px;font-weight:600;color:var(--text)" id="cfg-chapter-title">Capítulo</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:1px" id="cfg-chapter-words"></div>
+    </div>
+  </div>
+  <div class="config-body">
+    <div>
+      <div class="section-label">Velocidad base</div>
+      <div class="card">
+        <div class="slider-top">
+          <div><span class="val" id="spd-val">250</span> <span class="unit">ppm</span></div>
+          <div class="lvl" id="spd-lvl">Promedio</div>
+        </div>
+        <input type="range" id="spd-slider" min="100" max="700" step="10" value="250"
+               oninput="onSpdSlider(this.value)">
+      </div>
+    </div>
+    <div>
+      <div class="section-label">Modo</div>
+      <div class="mode-tabs">
+        <button class="mode-tab active" id="tab-libre" onclick="setReadMode('libre')">📖 Libre</button>
+        <button class="mode-tab" id="tab-train" onclick="setReadMode('train')">🏋 Entrenamiento</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="cfg-row">
+        <div><div class="cfg-label">Micro-pausas en puntuación</div>
+          <div class="cfg-sub">Coma ×1.5 · Punto ×2.5 · Párrafo ×4</div></div>
+        <label class="tgl"><input type="checkbox" id="mp-chk" checked onchange="cfg.microPauses=this.checked">
+          <span class="tgl-sl"></span></label>
+      </div>
+    </div>
+    <div id="train-panel" style="display:none;flex-direction:column;gap:12px">
+      <div class="card" style="display:flex;flex-direction:column;gap:4px">
+        <div class="cfg-row">
+          <div><div class="cfg-label">Duración del bloque</div>
+            <div class="cfg-sub" id="block-preview">≈ 500 palabras</div></div>
+          <div class="stepper">
+            <button onclick="adjBlock(-0.5)">−</button>
+            <span id="block-val">2.0 min</span>
+            <button onclick="adjBlock(+0.5)">+</button>
+          </div>
+        </div>
+        <div class="cfg-row">
+          <div><div class="cfg-label">Pausa entre bloques</div></div>
+          <div class="stepper">
+            <button onclick="adjPause(-5)">−</button>
+            <span id="pause-val">25 seg</span>
+            <button onclick="adjPause(+5)">+</button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="section-label">Repetición</div>
+        <div class="train-opts">
+          <label class="train-opt sel">
+            <input type="radio" name="trm" value="1" checked onchange="setTrainMode(1)">
+            <div><div class="train-opt-title">Una lectura con pausas</div>
+              <div class="badges"><span class="badge b1">×1</span></div></div>
+          </label>
+          <label class="train-opt">
+            <input type="radio" name="trm" value="2" onchange="setTrainMode(2)">
+            <div><div class="train-opt-title">Doble — Over-Speed</div>
+              <div class="badges"><span class="badge b1">×1 normal</span>
+                <span class="badge b2" id="b2lbl">×1 +30%</span></div></div>
+          </label>
+          <label class="train-opt">
+            <input type="radio" name="trm" value="3" onchange="setTrainMode(3)">
+            <div><div class="train-opt-title">Triple — Over-Speed máximo</div>
+              <div class="badges"><span class="badge b1">×1 normal</span>
+                <span class="badge b2" id="b2lbl2">×1 +30%</span>
+                <span class="badge b3" id="b3lbl">×1 +50%</span></div></div>
+          </label>
+        </div>
+      </div>
+      <div class="card" style="display:flex;flex-direction:column;gap:4px">
+        <div class="cfg-row">
+          <div><div class="cfg-label">Incremento 2ª lectura</div>
+            <div class="cfg-sub" id="p2prev">250 → 325 ppm</div></div>
+          <div class="stepper">
+            <button onclick="adjPct(2,-5)">−</button>
+            <span id="pct2v">+30%</span>
+            <button onclick="adjPct(2,+5)">+</button>
+          </div>
+        </div>
+        <div class="cfg-row" id="row-pct3" style="display:none">
+          <div><div class="cfg-label">Incremento 3ª lectura</div>
+            <div class="cfg-sub" id="p3prev">250 → 375 ppm</div></div>
+          <div class="stepper">
+            <button onclick="adjPct(3,-5)">−</button>
+            <span id="pct3v">+50%</span>
+            <button onclick="adjPct(3,+5)">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="sess-est" id="sess-est"></div>
+    </div>
+    <button class="btn-accent" id="btn-start-read" onclick="startReader()">Iniciar lectura</button>
+  </div>
+</div>
+
+<!-- ── SETTINGS ── -->
+<div id="screen-settings" class="screen">
+  <div class="settings-header">
+    <button class="btn-back" onclick="showHome()">←</button>
+    <div style="font-size:17px;font-weight:600">Ajustes</div>
+  </div>
+  <div class="settings-body">
+    <div>
+      <div class="section-label">Progreso guardado</div>
+      <div class="card" style="display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:13px;color:var(--muted);line-height:1.5">
+          El progreso se guarda automáticamente. Expórtalo a iCloud Drive como copia de seguridad.
+        </div>
+        <div class="backup-row">
+          <button class="btn-ghost" onclick="exportProgress()" style="font-size:13px;padding:10px">
+            📤 Exportar a iCloud
+          </button>
+          <button class="btn-ghost" onclick="document.getElementById('import-input').click()" style="font-size:13px;padding:10px">
+            📥 Importar
+          </button>
+        </div>
+        <input type="file" id="import-input" accept=".json" onchange="importProgress(event)">
+      </div>
+    </div>
+    <div>
+      <div class="section-label">Acerca de</div>
+      <div class="card" style="font-size:13px;color:var(--muted);line-height:1.7">
+        <strong style="color:var(--text)">RSVP Lector v5</strong><br>
+        Entrenador de lectura rápida con técnica RSVP.<br>
+        Soporta EPUB y TXT · Guarda progreso automáticamente.
+      </div>
+    </div>
+    <button class="btn-ghost" onclick="if(confirm('¿Borrar todo el progreso?'))clearAllProgress()"
+      style="color:#ff4545;border-color:#ff4545">🗑 Borrar todo el progreso</button>
+  </div>
 </div>
 
 <!-- ── READER ── -->
 <div id="screen-reader" class="screen">
   <div class="reader-top">
-    <button class="btn-back" onclick="goBack()">← Salir</button>
+    <button class="btn-back" onclick="exitReader()">← Cap.</button>
     <div class="reader-info">
       <strong id="r-idx">0</strong>/<span id="r-total">0</span>
       &nbsp;·&nbsp;<strong id="r-pct">0</strong>%
@@ -333,14 +445,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
     </div>
   </div>
   <div class="prog-track"><div class="prog-fill" id="r-prog"></div></div>
-
   <div class="pass-row" id="pass-row" style="display:none">
     <div class="pdot" id="pd1"></div>
     <div class="pdot" id="pd2" style="display:none"></div>
     <div class="pdot" id="pd3" style="display:none"></div>
     <span class="pass-txt" id="pass-txt"></span>
   </div>
-
   <div class="word-stage">
     <div class="word-box-wrap">
       <div class="word-box" id="word-box">
@@ -351,22 +461,21 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
         <div class="orp-bot" id="orp-bot" style="opacity:0">▲</div>
       </div>
       <div class="pause-ov hidden" id="pause-ov">
-        <div class="pause-ov-title" id="pov-title">Pausa — descansa la vista</div>
+        <div class="pov-title" id="pov-title">Pausa</div>
         <div class="pause-ring">
-          <svg width="76" height="76" viewBox="0 0 76 76">
-            <circle cx="38" cy="38" r="32" fill="none" stroke="#2a2a2a" stroke-width="5"/>
-            <circle id="parc" cx="38" cy="38" r="32" fill="none" stroke="#e8ff47"
+          <svg width="72" height="72" viewBox="0 0 72 72">
+            <circle cx="36" cy="36" r="30" fill="none" stroke="#2a2a2a" stroke-width="5"/>
+            <circle id="parc" cx="36" cy="36" r="30" fill="none" stroke="#e8ff47"
               stroke-width="5" stroke-linecap="round"
-              stroke-dasharray="201" stroke-dashoffset="0"/>
+              stroke-dasharray="188.5" stroke-dashoffset="0"/>
           </svg>
-          <div class="pause-ring-num" id="pov-num">25</div>
+          <div class="pring-num" id="pov-num">25</div>
         </div>
-        <div class="pause-sub" id="pov-sub"></div>
+        <div class="pov-sub" id="pov-sub"></div>
         <button class="btn-skip" onclick="skipPause()">Saltar pausa</button>
       </div>
     </div>
   </div>
-
   <div class="reader-ctrls">
     <div class="speed-row">
       <button class="btn-spd" onclick="chgSpd(-10)">−</button>
@@ -374,11 +483,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
       <button class="btn-spd" onclick="chgSpd(+10)">+</button>
     </div>
     <div class="ctrl-row">
-      <button class="btn-ctrl" onclick="restartSession()"><span class="ic">↺</span><span>Reiniciar</span></button>
+      <button class="btn-ctrl" onclick="restartReader()"><span class="ic">↺</span><span>Reiniciar</span></button>
       <button class="btn-ctrl btn-play" id="btn-play" onclick="togglePlay()">
         <span class="ic" id="play-ic">▶</span><span id="play-lbl">Iniciar</span>
       </button>
-      <button class="btn-ctrl" onclick="goBack()"><span class="ic">✕</span><span>Salir</span></button>
+      <button class="btn-ctrl" onclick="exitReader()"><span class="ic">✕</span><span>Salir</span></button>
     </div>
   </div>
 </div>
@@ -386,479 +495,752 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 <!-- ── DONE ── -->
 <div id="screen-done" class="screen">
   <div class="done-icon">✓</div>
-  <div class="done-title">¡Completado!</div>
+  <div class="done-title">¡Capítulo completado!</div>
   <div class="done-stats">
+    <div class="done-row"><span>Capítulo</span><strong id="d-chapter">—</strong></div>
     <div class="done-row"><span>Palabras</span><strong id="d-words">—</strong></div>
-    <div class="done-row"><span>Modo</span><strong id="d-mode">—</strong></div>
-    <div class="done-row"><span>Velocidad base</span><strong id="d-ppm">—</strong></div>
-    <div class="done-row"><span>Tiempo total</span><strong id="d-time">—</strong></div>
-    <div class="done-row"><span>Pasadas</span><strong id="d-passes">—</strong></div>
+    <div class="done-row"><span>Velocidad</span><strong id="d-ppm">—</strong></div>
+    <div class="done-row"><span>Tiempo</span><strong id="d-time">—</strong></div>
   </div>
-  <button class="btn-again" onclick="showLoad()">Leer otro texto</button>
+  <div class="done-btns">
+    <button class="btn-accent" id="btn-next-ch" onclick="nextChapter()">Siguiente capítulo →</button>
+    <button class="btn-ghost" onclick="showChapters()">Ver todos los capítulos</button>
+    <button class="btn-ghost" onclick="showHome()">Inicio</button>
+  </div>
 </div>
 
 <script>
-// ─────────────────────────────────────────────────────────────────────────────
-// DEMO TEXT
-// ─────────────────────────────────────────────────────────────────────────────
-const DEMO = "El cerebro humano contiene aproximadamente cien mil millones de neuronas interconectadas entre sí. Cada neurona puede establecer miles de conexiones sinápticas con otras células nerviosas.\n\nEsta red neuronal es la base de todo pensamiento, memoria y emoción que experimentamos a lo largo de nuestra vida. Los científicos estiman que el número total de conexiones posibles supera al de átomos en el universo observable.\n\nLa plasticidad cerebral nos permite aprender nuevas habilidades y modificar hábitos incluso en la edad adulta. El entrenamiento con RSVP explota este principio: al forzar al ojo a fijarse en un único punto, se elimina el movimiento sacádico innecesario y se entrena el procesamiento visual puro.\n\nCon sesiones diarias de diez minutos verás resultados en pocas semanas. La clave es la constancia y el aumento gradual de la velocidad, respetando siempre tu nivel de comprensión actual.";
+// ═══════════════════════════════════════════════════════════════════
+// DEMO
+// ═══════════════════════════════════════════════════════════════════
+const DEMO_BOOK = {
+  title: 'Texto Demo',
+  chapters: [
+    { title: 'El cerebro humano', words: [] },
+    { title: 'Plasticidad neuronal', words: [] },
+  ]
+};
+const DEMO_TEXTS = [
+  "El cerebro humano contiene aproximadamente cien mil millones de neuronas interconectadas entre sí. Cada neurona puede establecer miles de conexiones sinápticas con otras células nerviosas. Esta red neuronal es la base de todo pensamiento, memoria y emoción que experimentamos a lo largo de nuestra vida. Los científicos estiman que el número total de conexiones posibles supera al de átomos en el universo observable. La arquitectura del cerebro humano es la estructura más compleja que conocemos en el universo. Cada segundo procesa millones de señales sin que seamos conscientes de ello.",
+  "La plasticidad cerebral nos permite aprender nuevas habilidades y modificar hábitos incluso en la edad adulta. El entrenamiento con RSVP explota este principio: al forzar al ojo a fijarse en un único punto, se elimina el movimiento sacádico innecesario y se entrena el procesamiento visual puro. Con sesiones diarias de diez minutos verás resultados en pocas semanas. La clave es la constancia y el aumento gradual de la velocidad, respetando siempre tu nivel de comprensión actual. El cerebro se adapta y mejora con la práctica sistemática."
+];
 
-// ─────────────────────────────────────────────────────────────────────────────
-// CONFIG
-// ─────────────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════
+let book = null;        // {title, chapters:[{title,words:[]}]}
+let chapterIdx = 0;     // current chapter index
+let words = [];         // current chapter words
+
+// Session state
+let passes=[], passIdx=0, blockIdx=0, wordIdx=0;
+let running=false, inPause=false;
+let wordTimer=null, pauseTimer=null, pauseCb=null, pauseLeft=0;
+let sessionStart=0;
+
 const cfg = {
-  ppm: 250,
-  mode: 'libre',
-  trainMode: 1,
-  blockMin: 2.0,
-  pauseSec: 25,
-  pct2: 30,
-  pct3: 50,
-  microPauses: true,
+  ppm:250, readMode:'libre', trainMode:1,
+  blockMin:2.0, pauseSec:25, pct2:30, pct3:50, microPauses:true
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// STATE  (reset on each session)
-// ─────────────────────────────────────────────────────────────────────────────
-let words      = [];
-let passes     = [];   // [{ppm, blocks:[{start,end}]}]
-let passIdx    = 0;
-let blockIdx   = 0;
-let wordIdx    = 0;
-let running    = false;
-let inPause    = false;
-let wordTimer  = null;
-let pauseTimer = null;
-let pauseCb    = null;
-let pauseLeft  = 0;
-let sessionStart = 0;
-
-// ─────────────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════
 // HELPERS
-// ─────────────────────────────────────────────────────────────────────────────
-const $ = id => document.getElementById(id);
-
+// ═══════════════════════════════════════════════════════════════════
+const $=id=>document.getElementById(id);
 function lvl(p){
-  if(p<200) return "Lento";
-  if(p<300) return "Promedio";
-  if(p<450) return "Ágil";
-  if(p<600) return "Avanzado";
-  return "Experto";
+  if(p<200)return"Lento"; if(p<300)return"Promedio";
+  if(p<450)return"Ágil";  if(p<600)return"Avanzado"; return"Experto";
 }
-
 function orp(w){
-  const c = w.replace(/[^a-záéíóúüñA-ZÁÉÍÓÚÜÑ]/g,'');
-  const l = c.length;
-  if(l<=1) return 0; if(l<=5) return 1;
-  return Math.floor(l*0.35);
+  const c=w.replace(/[^a-záéíóúüñA-ZÁÉÍÓÚÜÑ]/g,'');
+  const l=c.length;
+  if(l<=1)return 0; if(l<=5)return 1; return Math.floor(l*0.35);
 }
-
-function tokenize(t){ return t.trim().split(/\s+/).filter(Boolean); }
-
+function tokenize(t){return t.trim().split(/\s+/).filter(Boolean)}
 function fmt(s){
-  s=Math.round(s);
-  if(s<60) return s+'s';
-  return Math.floor(s/60)+'m '+(s%60>0?s%60+'s':'');
+  s=Math.round(s); if(s<60)return s+'s';
+  return Math.floor(s/60)+'m'+(s%60?' '+s%60+'s':'');
 }
-
-// Delay for a word in ms (micro-pauses based on trailing punctuation)
-function wordDelay(w, ppm){
-  const base = 60000 / ppm;
-  if(!cfg.microPauses) return base;
-  if(/\n/.test(w))              return base * 4.0;  // paragraph
-  if(/[.!?]['"»)\]]*$/.test(w)) return base * 2.5;  // sentence end
-  if(/[,;:]['"»)\]]*$/.test(w)) return base * 1.5;  // comma
-  return base;
+function wordDelay(w,ppm){
+  const b=60000/ppm; if(!cfg.microPauses)return b;
+  if(/\n/.test(w))return b*4;
+  if(/[.!?]['"»)\]]*$/.test(w))return b*2.5;
+  if(/[,;:]['"»)\]]*$/.test(w))return b*1.5;
+  return b;
 }
-
-// Find sentence boundary at or before idx (search back max 60 words)
 function sentBoundary(idx){
-  for(let i=Math.min(idx, words.length-1); i>=Math.max(0,idx-60); i--){
-    if(/[.!?\n]['"»)\]]*$/.test(words[i])) return i+1;
-  }
+  for(let i=Math.min(idx,words.length-1);i>=Math.max(0,idx-60);i--)
+    if(/[.!?\n]['"»)\]]*$/.test(words[i]))return i+1;
   return idx;
 }
-
-// Build block list for a pass
 function makeBlocks(ppm){
-  const bw = Math.round(ppm * cfg.blockMin);
-  const blks = [];
-  let pos = 0;
-  while(pos < words.length){
-    let end = pos + bw;
-    if(end < words.length) end = sentBoundary(end);
-    end = Math.min(end, words.length);
-    if(end <= pos) end = Math.min(pos + bw, words.length);
-    blks.push({start:pos, end:end});
-    pos = end;
+  const bw=Math.round(ppm*cfg.blockMin);
+  const blks=[];let pos=0;
+  while(pos<words.length){
+    let end=pos+bw;
+    if(end<words.length)end=sentBoundary(end);
+    end=Math.min(end,words.length);
+    if(end<=pos)end=Math.min(pos+bw,words.length);
+    blks.push({start:pos,end});pos=end;
   }
   return blks;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// LOAD SCREEN UI
-// ─────────────────────────────────────────────────────────────────────────────
-function onSpeedSlider(v){
-  cfg.ppm = parseInt(v);
-  $('spd-val').textContent = cfg.ppm;
-  $('spd-lvl').textContent = lvl(cfg.ppm);
-  updatePreviews();
+// ═══════════════════════════════════════════════════════════════════
+// PERSISTENCE
+// ═══════════════════════════════════════════════════════════════════
+const STORE_KEY='rsvp_progress_v1';
+const BOOKS_KEY='rsvp_books_v1';
+
+function saveProgress(){
+  if(!book)return;
+  try{
+    const data=JSON.parse(localStorage.getItem(STORE_KEY)||'{}');
+    data[book.title]={
+      bookTitle:book.title,
+      chapterIdx,
+      wordIdx,
+      ppm:cfg.ppm,
+      timestamp:Date.now(),
+      totalChapters:book.chapters.length,
+      chaptersRead:[...new Set([...(data[book.title]?.chaptersRead||[]),
+        ...(wordIdx>words.length*0.9?[chapterIdx]:[])
+      ])]
+    };
+    localStorage.setItem(STORE_KEY,JSON.stringify(data));
+  }catch(e){}
 }
 
-function setMode(m){
-  cfg.mode = m;
-  $('tab-libre').classList.toggle('active', m==='libre');
-  $('tab-train').classList.toggle('active', m==='train');
-  $('train-panel').style.display = m==='train' ? 'flex' : 'none';
-  updatePreviews();
+function loadProgress(bookTitle){
+  try{
+    const data=JSON.parse(localStorage.getItem(STORE_KEY)||'{}');
+    return data[bookTitle]||null;
+  }catch(e){return null}
 }
 
-function setTrainMode(n){
-  cfg.trainMode = n;
-  document.querySelectorAll('.train-opt').forEach(el=>{
-    el.classList.toggle('sel', parseInt(el.querySelector('input').value)===n);
-  });
-  $('row-pct3').style.display = n>=3 ? 'flex' : 'none';
-  updatePreviews();
+function markChapterDone(){
+  if(!book)return;
+  try{
+    const data=JSON.parse(localStorage.getItem(STORE_KEY)||'{}');
+    const entry=data[book.title]||{chaptersRead:[]};
+    if(!entry.chaptersRead)entry.chaptersRead=[];
+    if(!entry.chaptersRead.includes(chapterIdx))entry.chaptersRead.push(chapterIdx);
+    entry.bookTitle=book.title; entry.chapterIdx=chapterIdx;
+    entry.wordIdx=0; entry.ppm=cfg.ppm; entry.timestamp=Date.now();
+    entry.totalChapters=book.chapters.length;
+    data[book.title]=entry;
+    localStorage.setItem(STORE_KEY,JSON.stringify(data));
+  }catch(e){}
 }
 
-function adjBlock(d){
-  cfg.blockMin = Math.max(0.5, Math.min(10, cfg.blockMin+d));
-  $('block-val').textContent = cfg.blockMin.toFixed(1)+' min';
-  updatePreviews();
+function getChaptersRead(bookTitle){
+  try{
+    const data=JSON.parse(localStorage.getItem(STORE_KEY)||'{}');
+    return data[bookTitle]?.chaptersRead||[];
+  }catch(e){return[]}
 }
 
-function adjPause(d){
-  cfg.pauseSec = Math.max(5, Math.min(120, cfg.pauseSec+d));
-  $('pause-val').textContent = cfg.pauseSec+' seg';
+function exportProgress(){
+  try{
+    const data=localStorage.getItem(STORE_KEY)||'{}';
+    const blob=new Blob([data],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download='rsvp_progreso.json'; a.click();
+    URL.revokeObjectURL(url);
+  }catch(e){alert('Error al exportar: '+e.message)}
 }
 
-function adjPct(pass, d){
-  if(pass===2){
-    cfg.pct2 = Math.max(5, Math.min(100, cfg.pct2+d));
-    $('pct2-val').textContent = '+'+cfg.pct2+'%';
-  } else {
-    cfg.pct3 = Math.max(cfg.pct2+5, Math.min(150, cfg.pct3+d));
-    $('pct3-val').textContent = '+'+cfg.pct3+'%';
+function importProgress(e){
+  const f=e.target.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      JSON.parse(ev.target.result); // validate
+      localStorage.setItem(STORE_KEY,ev.target.result);
+      alert('Progreso importado correctamente.');
+      renderHome();
+    }catch(err){alert('Fichero no válido.')}
+  };
+  r.readAsText(f);
+}
+
+function clearAllProgress(){
+  localStorage.removeItem(STORE_KEY);
+  renderHome();
+  alert('Progreso borrado.');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// EPUB PARSER  (pure JS, no library needed)
+// ═══════════════════════════════════════════════════════════════════
+async function loadEpub(e){
+  const file=e.target.files[0]; if(!file)return;
+  try{
+    showLoading('Cargando EPUB…');
+    const buf=await file.arrayBuffer();
+    const zip=await unzipBuffer(buf);
+
+    // Find OPF file (package document)
+    const containerXml=await readZipEntry(zip,'META-INF/container.xml');
+    const opfPath=containerXml.match(/full-path="([^"]+\.opf)"/i)?.[1];
+    if(!opfPath)throw new Error('OPF no encontrado');
+
+    const opfDir=opfPath.includes('/')?opfPath.slice(0,opfPath.lastIndexOf('/')+1):'';
+    const opfXml=await readZipEntry(zip,opfPath);
+
+    // Parse spine order
+    const manifestItems={};
+    [...opfXml.matchAll(/<item[^>]+id="([^"]+)"[^>]+href="([^"]+)"[^>]*media-type="application\/xhtml[^"]*"/gi)]
+      .forEach(m=>manifestItems[m[1]]=m[2]);
+
+    const spineIds=[...opfXml.matchAll(/<itemref[^>]+idref="([^"]+)"/gi)].map(m=>m[1]);
+
+    // Get NCX/NAV for chapter titles
+    const titles={};
+    const ncxEntry=Object.values(manifestItems).find(h=>h.endsWith('.ncx'));
+    if(ncxEntry){
+      try{
+        const ncxXml=await readZipEntry(zip,opfDir+ncxEntry);
+        [...ncxXml.matchAll(/<navPoint[^>]*>.*?<text>([^<]+)<\/text>.*?<content[^>]+src="([^#"]+)/gsi)]
+          .forEach(m=>{
+            const href=m[2].split('/').pop();
+            titles[href]=m[1].trim();
+          });
+      }catch(e){}
+    }
+
+    // Extract chapters
+    const chapters=[];
+    let prevTitle='';
+    for(const id of spineIds){
+      const href=manifestItems[id];
+      if(!href)continue;
+      const fullPath=opfDir+href;
+      try{
+        const html=await readZipEntry(zip,fullPath);
+        const text=htmlToText(html);
+        const ws=tokenize(text);
+        if(ws.length<30)continue; // skip tiny pages
+        const fname=href.split('/').pop();
+        const title=titles[fname]||titles[href]||guessChapterTitle(html)||('Sección '+(chapters.length+1));
+        if(title===prevTitle)continue; // skip duplicate
+        prevTitle=title;
+        chapters.push({title,words:ws});
+      }catch(e){}
+    }
+
+    if(!chapters.length)throw new Error('No se encontraron capítulos en el EPUB');
+
+    const bookTitle=file.name.replace('.epub','');
+    book={title:bookTitle,chapters};
+    hideLoading();
+    openBook();
+  }catch(err){
+    hideLoading();
+    alert('Error al leer el EPUB:\n'+err.message);
   }
-  updatePreviews();
+  e.target.value='';
 }
 
-function updatePreviews(){
-  const bw = Math.round(cfg.ppm * cfg.blockMin);
-  $('block-preview').textContent = '≈ '+bw+' palabras por bloque';
-  const p2 = Math.round(cfg.ppm*(1+cfg.pct2/100));
-  const p3 = Math.round(cfg.ppm*(1+cfg.pct3/100));
-  $('p2-preview').textContent = cfg.ppm+' → '+p2+' ppm';
-  $('p3-preview').textContent = cfg.ppm+' → '+p3+' ppm';
-  ['b2a','b2b'].forEach(id=>{ if($(id)) $(id).textContent='×1 +'+cfg.pct2+'%'; });
-  ['b3a'].forEach(id=>{ if($(id)) $(id).textContent='×1 +'+cfg.pct3+'%'; });
-  if(words.length && cfg.mode==='train'){
-    const n = words.length;
-    const numBlk = Math.ceil(n/bw);
-    const pTotal = (numBlk-1)*cfg.pauseSec;
-    let t = n/cfg.ppm*60 + pTotal;
-    if(cfg.trainMode>=2) t += n/p2*60 + pTotal + cfg.pauseSec;
-    if(cfg.trainMode>=3) t += n/p3*60 + pTotal + cfg.pauseSec;
-    $('sess-est').textContent = 'Duración estimada: ≈ '+fmt(t);
-  } else {
-    $('sess-est').textContent = '';
-  }
+function htmlToText(html){
+  // Remove scripts and styles
+  html=html.replace(/<script[\s\S]*?<\/script>/gi,'')
+           .replace(/<style[\s\S]*?<\/style>/gi,'');
+  // Mark paragraph breaks
+  html=html.replace(/<\/p>/gi,' \n')
+           .replace(/<br\s*\/?>/gi,' \n')
+           .replace(/<\/h[1-6]>/gi,' \n');
+  // Strip all tags
+  html=html.replace(/<[^>]+>/g,' ');
+  // Decode entities
+  html=html.replace(/&nbsp;/g,' ').replace(/&amp;/g,'&')
+           .replace(/&lt;/g,'<').replace(/&gt;/g,'>')
+           .replace(/&quot;/g,'"').replace(/&#39;/g,"'")
+           .replace(/&#\d+;/g,'');
+  return html.replace(/\s+/g,' ').trim();
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// FILE / TEXT LOADING
-// ─────────────────────────────────────────────────────────────────────────────
-const pasteEl = $('paste-input');
-pasteEl.addEventListener('input', ()=>{
-  words = tokenize(pasteEl.value);
-  const chip = $('word-chip'), btn = $('btn-start');
-  if(words.length){
-    chip.textContent = words.length+' palabras detectadas';
-    chip.className = 'word-chip ready';
-    btn.disabled = false;
-  } else {
-    chip.textContent = ''; chip.className='word-chip'; btn.disabled=true;
-  }
-  updatePreviews();
-});
+function guessChapterTitle(html){
+  const m=html.match(/<h[1-3][^>]*>([^<]+)</i);
+  return m?m[1].trim().slice(0,60):null;
+}
 
-function openFile(){ $('file-input').click(); }
-function loadFile(e){
-  const f = e.target.files[0]; if(!f) return;
-  const r = new FileReader();
-  r.onload = ev=>{ pasteEl.value=ev.target.result; pasteEl.dispatchEvent(new Event('input')); };
+// ── Minimal ZIP reader (no external lib) ──────────────────────────
+async function unzipBuffer(buf){
+  // Use DecompressionStream if available, else fallback
+  const view=new DataView(buf);
+  const entries={};
+  // Find end of central directory
+  let eocd=-1;
+  for(let i=buf.byteLength-22;i>=0;i--){
+    if(view.getUint32(i,true)===0x06054b50){eocd=i;break;}
+  }
+  if(eocd<0)throw new Error('ZIP inválido');
+  const cdOffset=view.getUint32(eocd+16,true);
+  const cdSize=view.getUint32(eocd+12,true);
+  let pos=cdOffset;
+  const te=new TextDecoder();
+  while(pos<cdOffset+cdSize){
+    if(view.getUint32(pos,true)!==0x02014b50)break;
+    const method=view.getUint16(pos+10,true);
+    const compSize=view.getUint32(pos+20,true);
+    const uncompSize=view.getUint32(pos+24,true);
+    const fnLen=view.getUint16(pos+28,true);
+    const extLen=view.getUint16(pos+30,true);
+    const cmtLen=view.getUint16(pos+32,true);
+    const localOffset=view.getUint32(pos+42,true);
+    const fname=te.decode(new Uint8Array(buf,pos+46,fnLen));
+    entries[fname]={method,compSize,uncompSize,localOffset};
+    pos+=46+fnLen+extLen+cmtLen;
+  }
+  return {entries,buf};
+}
+
+async function readZipEntry(zip,path){
+  // Normalize path
+  const entry=zip.entries[path]||zip.entries[path.replace(/^\//,'')];
+  if(!entry)throw new Error('Entrada no encontrada: '+path);
+  const view=new DataView(zip.buf);
+  const lo=entry.localOffset;
+  if(view.getUint32(lo,true)!==0x04034b50)throw new Error('Local header inválido');
+  const fnLen=view.getUint16(lo+26,true);
+  const extLen=view.getUint16(lo+28,true);
+  const dataStart=lo+30+fnLen+extLen;
+  const compData=new Uint8Array(zip.buf,dataStart,entry.compSize);
+  if(entry.method===0){
+    return new TextDecoder().decode(compData);
+  } else if(entry.method===8){
+    const ds=new DecompressionStream('deflate-raw');
+    const writer=ds.writable.getWriter();
+    const reader=ds.readable.getReader();
+    writer.write(compData); writer.close();
+    const chunks=[];
+    while(true){const{done,value}=await reader.read();if(done)break;chunks.push(value);}
+    const result=new Uint8Array(chunks.reduce((a,c)=>a+c.length,0));
+    let offset=0; for(const c of chunks){result.set(c,offset);offset+=c.length;}
+    return new TextDecoder().decode(result);
+  }
+  throw new Error('Método de compresión no soportado: '+entry.method);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// TXT LOADER
+// ═══════════════════════════════════════════════════════════════════
+function loadTxt(e){
+  const f=e.target.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    const text=ev.target.result;
+    const ws=tokenize(text);
+    book={title:f.name.replace('.txt',''),chapters:[{title:f.name.replace('.txt',''),words:ws}]};
+    openBook();
+  };
   r.readAsText(f,'utf-8');
+  e.target.value='';
 }
-function loadDemo(){ pasteEl.value=DEMO; pasteEl.dispatchEvent(new Event('input')); }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SCREEN NAV
-// ─────────────────────────────────────────────────────────────────────────────
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  $(id).classList.add('active');
+function loadDemo(){
+  DEMO_BOOK.chapters[0].words=tokenize(DEMO_TEXTS[0]);
+  DEMO_BOOK.chapters[1].words=tokenize(DEMO_TEXTS[1]);
+  book={...DEMO_BOOK,chapters:DEMO_BOOK.chapters.map(c=>({...c}))};
+  openBook();
 }
-function showLoad(){ stopAll(); showScreen('screen-load'); }
-function goBack(){   stopAll(); showScreen('screen-load'); }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SESSION BUILD
-// ─────────────────────────────────────────────────────────────────────────────
-function startSession(){
-  words = tokenize(pasteEl.value);
-  if(!words.length) return;
+// ═══════════════════════════════════════════════════════════════════
+// LOADING INDICATOR
+// ═══════════════════════════════════════════════════════════════════
+function showLoading(msg){
+  let el=$('loading-overlay');
+  if(!el){
+    el=document.createElement('div');
+    el.id='loading-overlay';
+    el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:999;font-size:15px;color:#e8ff47';
+    el.innerHTML='<div style="font-size:32px">📖</div><div id="loading-msg"></div>';
+    document.body.appendChild(el);
+  }
+  $('loading-msg').textContent=msg;
+  el.style.display='flex';
+}
+function hideLoading(){const el=$('loading-overlay');if(el)el.style.display='none';}
 
-  const spds = [cfg.ppm];
-  if(cfg.mode==='train' && cfg.trainMode>=2) spds.push(Math.round(cfg.ppm*(1+cfg.pct2/100)));
-  if(cfg.mode==='train' && cfg.trainMode>=3) spds.push(Math.round(cfg.ppm*(1+cfg.pct3/100)));
+// ═══════════════════════════════════════════════════════════════════
+// BOOK / CHAPTER FLOW
+// ═══════════════════════════════════════════════════════════════════
+function openBook(){
+  // Check saved progress
+  const prog=book?loadProgress(book.title):null;
+  chapterIdx=prog?.chapterIdx||0;
+  if(prog?.ppm)cfg.ppm=$('spd-slider').value=prog.ppm;
+  updateSpdUI(cfg.ppm);
+  showChapters();
+}
 
-  passes   = spds.map(p=>({ ppm:p, blocks:makeBlocks(p) }));
-  passIdx  = 0;
-  blockIdx = 0;
-  wordIdx  = 0;
-  running  = false;
-  inPause  = false;
-  sessionStart = Date.now();
+function showHome(){
+  renderHome();
+  showScreen('screen-home');
+}
 
+function showChapters(){
+  if(!book){showHome();return;}
+  $('ch-book-title').textContent=book.title;
+  $('ch-book-sub').textContent=book.chapters.length+' capítulos · '+
+    book.chapters.reduce((a,c)=>a+c.words.length,0).toLocaleString()+' palabras';
+  renderChapterList();
+  showScreen('screen-chapters');
+}
+
+function renderChapterList(){
+  const done=getChaptersRead(book.title);
+  const prog=loadProgress(book.title);
+  const list=$('chapters-list');
+  list.innerHTML='';
+  book.chapters.forEach((ch,i)=>{
+    const isCurrent=prog&&prog.chapterIdx===i&&prog.wordIdx>0;
+    const isDone=done.includes(i);
+    const div=document.createElement('div');
+    div.className='chapter-item'+(isCurrent?' current':isDone?' done':'');
+    const pct=isCurrent?Math.round(prog.wordIdx/ch.words.length*100):isDone?100:0;
+    div.innerHTML=`
+      <div class="ch-num">${i+1}</div>
+      <div class="ch-info">
+        <div class="ch-title">${ch.title}</div>
+        <div class="ch-words">${ch.words.length.toLocaleString()} palabras
+          ${isCurrent?` · ${pct}% leído`:''}
+        </div>
+        ${pct>0?`<div class="mini-prog"><div class="mini-prog-fill" style="width:${pct}%"></div></div>`:''}
+      </div>
+      ${isCurrent?'<span class="ch-badge current">Continuar</span>':
+        isDone?'<span class="ch-badge done">✓</span>':''}
+    `;
+    div.onclick=()=>selectChapter(i);
+    list.appendChild(div);
+  });
+}
+
+function selectChapter(i){
+  chapterIdx=i;
+  words=[...book.chapters[i].words];
+  // Check if there's a saved word position
+  const prog=loadProgress(book.title);
+  const savedWord=(prog?.chapterIdx===i&&prog?.wordIdx>0)?prog.wordIdx:0;
+
+  $('cfg-chapter-title').textContent=book.chapters[i].title;
+  $('cfg-chapter-words').textContent=words.length.toLocaleString()+' palabras'+(savedWord>0?` · Guardado en palabra ${savedWord}`:'');
+  updatePreviews();
+
+  // Store saved word for use when starting
+  $('btn-start-read').dataset.savedWord=savedWord;
+  if(savedWord>0){
+    $('btn-start-read').textContent='▶ Continuar (pal. '+savedWord+')';
+  } else {
+    $('btn-start-read').textContent='Iniciar lectura';
+  }
+  showScreen('screen-config');
+}
+
+function renderHome(){
+  // Recent books from progress
+  try{
+    const data=JSON.parse(localStorage.getItem(STORE_KEY)||'{}');
+    const books=Object.values(data).sort((a,b)=>b.timestamp-a.timestamp);
+    const sect=$('recent-section'), list=$('recent-list');
+    list.innerHTML='';
+    if(books.length){
+      sect.style.display='block';
+      books.forEach(b=>{
+        const pct=b.totalChapters?Math.round((b.chaptersRead?.length||0)/b.totalChapters*100):0;
+        const div=document.createElement('div');
+        div.className='recent-item';
+        div.innerHTML=`
+          <div class="ri-icon">📚</div>
+          <div class="ri-info">
+            <div class="ri-title">${b.bookTitle}</div>
+            <div class="ri-sub">Cap. ${b.chapterIdx+1} · ${new Date(b.timestamp).toLocaleDateString('es')}</div>
+            <div class="ri-prog">${pct}% completado</div>
+            <div class="mini-prog"><div class="mini-prog-fill" style="width:${pct}%"></div></div>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+    } else {
+      sect.style.display='none';
+    }
+
+    // Continue banner (most recent)
+    const banner=$('continue-banner');
+    if(books.length&&book){
+      const last=books[0];
+      banner.style.display='flex';
+      $('cb-sub').textContent=`${last.bookTitle} — Cap. ${last.chapterIdx+1}`;
+    } else {
+      banner.style.display='none';
+    }
+  }catch(e){}
+}
+
+function continueReading(){
+  if(!book){showHome();return;}
+  const prog=loadProgress(book.title);
+  if(prog){
+    chapterIdx=prog.chapterIdx;
+    selectChapter(chapterIdx);
+  }
+}
+
+function showSettings(){ showScreen('screen-settings'); }
+
+// ═══════════════════════════════════════════════════════════════════
+// CONFIG SCREEN
+// ═══════════════════════════════════════════════════════════════════
+function onSpdSlider(v){ cfg.ppm=parseInt(v); updateSpdUI(cfg.ppm); updatePreviews(); }
+function updateSpdUI(p){
+  $('spd-val').textContent=p; $('spd-lvl').textContent=lvl(p);
+  $('r-ppm').textContent=p;   $('r-lvl').textContent=lvl(p);
+  $('spd-slider').value=p;
+}
+function setReadMode(m){
+  cfg.readMode=m;
+  $('tab-libre').classList.toggle('active',m==='libre');
+  $('tab-train').classList.toggle('active',m==='train');
+  $('train-panel').style.display=m==='train'?'flex':'none';
+  updatePreviews();
+}
+function setTrainMode(n){
+  cfg.trainMode=n;
+  document.querySelectorAll('.train-opt').forEach(el=>{
+    el.classList.toggle('sel',parseInt(el.querySelector('input').value)===n);
+  });
+  $('row-pct3').style.display=n>=3?'flex':'none';
+  updatePreviews();
+}
+function adjBlock(d){cfg.blockMin=Math.max(.5,Math.min(10,cfg.blockMin+d));$('block-val').textContent=cfg.blockMin.toFixed(1)+' min';updatePreviews();}
+function adjPause(d){cfg.pauseSec=Math.max(5,Math.min(120,cfg.pauseSec+d));$('pause-val').textContent=cfg.pauseSec+' seg';}
+function adjPct(pass,d){
+  if(pass===2){cfg.pct2=Math.max(5,Math.min(100,cfg.pct2+d));$('pct2v').textContent='+'+cfg.pct2+'%';}
+  else{cfg.pct3=Math.max(cfg.pct2+5,Math.min(150,cfg.pct3+d));$('pct3v').textContent='+'+cfg.pct3+'%';}
+  updatePreviews();
+}
+function updatePreviews(){
+  if(!words.length)return;
+  const bw=Math.round(cfg.ppm*cfg.blockMin);
+  $('block-preview').textContent='≈ '+bw+' palabras por bloque';
+  const p2=Math.round(cfg.ppm*(1+cfg.pct2/100));
+  const p3=Math.round(cfg.ppm*(1+cfg.pct3/100));
+  $('p2prev').textContent=cfg.ppm+' → '+p2+' ppm';
+  $('p3prev').textContent=cfg.ppm+' → '+p3+' ppm';
+  ['b2lbl','b2lbl2'].forEach(id=>{if($(id))$(id).textContent='×1 +'+cfg.pct2+'%';});
+  if($('b3lbl'))$('b3lbl').textContent='×1 +'+cfg.pct3+'%';
+  if(cfg.readMode==='train'){
+    const numBlk=Math.ceil(words.length/bw);
+    const pt=(numBlk-1)*cfg.pauseSec;
+    let t=words.length/cfg.ppm*60+pt;
+    if(cfg.trainMode>=2)t+=words.length/p2*60+pt+cfg.pauseSec;
+    if(cfg.trainMode>=3)t+=words.length/p3*60+pt+cfg.pauseSec;
+    $('sess-est').textContent='Duración estimada: ≈ '+fmt(t);
+  } else {$('sess-est').textContent='';}
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// READER ENGINE
+// ═══════════════════════════════════════════════════════════════════
+function startReader(){
+  const saved=parseInt($('btn-start-read').dataset.savedWord||0);
+  const spds=[cfg.ppm];
+  if(cfg.readMode==='train'&&cfg.trainMode>=2)spds.push(Math.round(cfg.ppm*(1+cfg.pct2/100)));
+  if(cfg.readMode==='train'&&cfg.trainMode>=3)spds.push(Math.round(cfg.ppm*(1+cfg.pct3/100)));
+  passes=spds.map(p=>({ppm:p,blocks:makeBlocks(p)}));
+  passIdx=0; blockIdx=0; wordIdx=saved; running=false; inPause=false;
+  sessionStart=Date.now();
   showScreen('screen-reader');
   setupPassDots();
-  updateReaderUI();
   showWord();
+  updateReaderUI();
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// READER UI
-// ─────────────────────────────────────────────────────────────────────────────
 function setupPassDots(){
-  const n = passes.length;
-  const show = cfg.mode==='train' && n>1;
-  $('pass-row').style.display = show ? 'flex' : 'none';
-  ['pd1','pd2','pd3'].forEach((id,i)=>{
-    $(id).style.display = i<n ? 'inline-block':'none';
-  });
+  const n=passes.length, show=cfg.readMode==='train'&&n>1;
+  $('pass-row').style.display=show?'flex':'none';
+  ['pd1','pd2','pd3'].forEach((id,i)=>{$(id).style.display=i<n?'inline-block':'none';});
   refreshPassDots();
 }
-
 function refreshPassDots(){
   ['pd1','pd2','pd3'].forEach((id,i)=>{
     const el=$(id);
-    if(i<passIdx)       el.className='pdot done';
-    else if(i===passIdx) el.className='pdot active';
-    else                 el.className='pdot';
+    if(i<passIdx)el.className='pdot done';
+    else if(i===passIdx)el.className='pdot active';
+    else el.className='pdot';
   });
   const labels=['1ª lectura','2ª lectura — rápida','3ª lectura — máxima'];
-  $('pass-txt').textContent = passes.length>1 ? labels[passIdx]||'' : '';
-  const ppm = passes[passIdx].ppm;
-  $('r-ppm').textContent  = ppm;
-  $('r-lvl').textContent  = lvl(ppm);
-  $('r-pass-spd').textContent = passes.length>1 ? ppm+' ppm' : '';
+  $('pass-txt').textContent=passes.length>1?labels[passIdx]||'':'';
+  const ppm=passes[passIdx].ppm;
+  $('r-ppm').textContent=ppm; $('r-lvl').textContent=lvl(ppm);
+  $('r-pass-spd').textContent=passes.length>1?ppm+' ppm':'';
 }
-
 function updateReaderUI(){
-  const total = words.length;
-  const pct   = total ? Math.round(wordIdx/total*100) : 0;
-  $('r-idx').textContent  = wordIdx;
-  $('r-total').textContent = total;
-  $('r-pct').textContent  = pct;
-  $('r-prog').style.width = pct+'%';
+  const total=words.length, pct=total?Math.round(wordIdx/total*100):0;
+  $('r-idx').textContent=wordIdx; $('r-total').textContent=total;
+  $('r-pct').textContent=pct; $('r-prog').style.width=pct+'%';
 }
-
 function showWord(){
-  if(wordIdx >= words.length){
-    $('word-disp').innerHTML = '<span class="word-idle">✓ Fin</span>';
-    $('orp-top').style.opacity='0'; $('orp-bot').style.opacity='0';
+  if(wordIdx>=words.length){
+    $('word-disp').innerHTML='<span class="word-idle">✓ Fin</span>';
+    $('orp-top').style.opacity=$('orp-bot').style.opacity='0';
     return;
   }
-  const w   = words[wordIdx];
-  const o   = orp(w);
-  $('word-disp').innerHTML =
+  const w=words[wordIdx], o=orp(w);
+  $('word-disp').innerHTML=
     '<span>'+w.slice(0,o)+'</span>'+
     '<span class="word-pivot">'+w.slice(o,o+1)+'</span>'+
     '<span>'+w.slice(o+1)+'</span>';
-
-  // Position ORP markers
-  const bw = $('word-box').offsetWidth;
-  const cw = 22; // approx char width px
-  const sx = (bw - w.length*cw)/2;
-  const px = Math.round((sx + o*cw + cw/2)/bw*100);
+  const bw=$('word-box').offsetWidth, cw=22;
+  const sx=(bw-w.length*cw)/2, px=Math.round((sx+o*cw+cw/2)/bw*100);
   [$('orp-top'),$('orp-bot')].forEach(el=>{
     el.style.left=px+'%'; el.style.transform='translateX(-50%)'; el.style.opacity='1';
   });
   updateReaderUI();
+  // Auto-save every 50 words
+  if(wordIdx%50===0)saveProgress();
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// PLAY ENGINE  (simple: show word → set timeout for next)
-// ─────────────────────────────────────────────────────────────────────────────
-function scheduleNextWord(){
-  if(!running) return;
-  const w = words[wordIdx] || '';
-  const ppm = passes[passIdx].ppm;
-  const delay = wordDelay(w, ppm);
-  wordTimer = setTimeout(()=>{
-    if(!running) return;
+// ── PLAY ENGINE ───────────────────────────────────────────────────
+function scheduleNext(){
+  if(!running)return;
+  const w=words[wordIdx]||'', ppm=passes[passIdx].ppm;
+  const delay=wordDelay(w,ppm);
+  wordTimer=setTimeout(()=>{
+    if(!running)return;
     wordIdx++;
-    if(wordIdx >= words.length){
-      // end of pass
-      onPassEnd();
-      return;
-    }
-    // Check block boundary
-    const blk = passes[passIdx].blocks[blockIdx];
-    if(blk && wordIdx >= blk.end){
+    if(wordIdx>=words.length){onPassEnd();return;}
+    const blk=passes[passIdx].blocks[blockIdx];
+    if(blk&&wordIdx>=blk.end){
       blockIdx++;
-      const isLastBlock = blockIdx >= passes[passIdx].blocks.length;
-      if(isLastBlock){
-        onPassEnd();
-      } else {
-        showWord();
-        if(cfg.mode==='train'){
-          running=false; setPlayUI(false);
-          beginPause('Pausa — descansa la vista', '', ()=>{ running=true; setPlayUI(true); scheduleNextWord(); });
-        } else {
-          scheduleNextWord();
-        }
-      }
+      if(blockIdx>=passes[passIdx].blocks.length){onPassEnd();return;}
+      showWord();
+      if(cfg.readMode==='train'){
+        running=false; setPlayUI(false);
+        beginPause('Pausa — descansa la vista','',()=>{running=true;setPlayUI(true);scheduleNext();});
+      } else scheduleNext();
       return;
     }
-    showWord();
-    scheduleNextWord();
-  }, delay);
+    showWord(); scheduleNext();
+  },delay);
 }
-
 function onPassEnd(){
-  clearTimeout(wordTimer); wordTimer=null;
-  running=false; setPlayUI(false);
-  if(passIdx >= passes.length-1){
-    showDone();
-  } else {
-    passIdx++;
-    blockIdx=0;
-    wordIdx=0;
-    refreshPassDots();
-    const label = ['','2ª lectura — velocidad +'+cfg.pct2+'%','3ª lectura — velocidad +'+cfg.pct3+'%'];
-    beginPause('Preparando siguiente pasada', label[passIdx]||'', ()=>{
-      showWord();
-      running=true; setPlayUI(true);
-      scheduleNextWord();
+  clearTimeout(wordTimer); wordTimer=null; running=false; setPlayUI(false);
+  if(passIdx>=passes.length-1){markChapterDone();showDone();}
+  else{
+    passIdx++; blockIdx=0; wordIdx=0; refreshPassDots();
+    const label=['','2ª lectura — velocidad +'+cfg.pct2+'%','3ª lectura — velocidad +'+cfg.pct3+'%'];
+    beginPause('Preparando siguiente pasada',label[passIdx]||'',()=>{
+      showWord(); running=true; setPlayUI(true); scheduleNext();
     });
   }
 }
-
 function togglePlay(){
-  if(inPause){ skipPause(); return; }
-  if(running){ pauseReading(); } else { resumeReading(); }
+  if(inPause){skipPause();return;}
+  if(running)pauseReading(); else resumeReading();
 }
-
 function resumeReading(){
-  if(wordIdx>=words.length) return;
-  running=true; setPlayUI(true);
-  scheduleNextWord();
+  if(wordIdx>=words.length)return;
+  running=true; setPlayUI(true); scheduleNext();
 }
-
 function pauseReading(){
-  running=false;
-  clearTimeout(wordTimer); wordTimer=null;
-  setPlayUI(false);
+  running=false; clearTimeout(wordTimer); wordTimer=null; setPlayUI(false);
+  saveProgress();
 }
-
 function stopAll(){
   running=false; inPause=false;
   clearTimeout(wordTimer); wordTimer=null;
   clearInterval(pauseTimer); pauseTimer=null;
-  pauseCb=null;
-  hidePauseOv();
-  setPlayUI(false);
+  pauseCb=null; hidePauseOv(); setPlayUI(false);
+  saveProgress();
+}
+function setPlayUI(p){
+  $('play-ic').textContent=p?'⏸':'▶';
+  $('play-lbl').textContent=p?'Pausar':(wordIdx>0?'Continuar':'Iniciar');
 }
 
-function setPlayUI(isPlaying){
-  $('play-ic').textContent  = isPlaying ? '⏸' : '▶';
-  $('play-lbl').textContent = isPlaying ? 'Pausar' : (wordIdx>0?'Continuar':'Iniciar');
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// PAUSE OVERLAY
-// ─────────────────────────────────────────────────────────────────────────────
-const ARC = 201;
-function beginPause(title, sub, cb){
+// ── PAUSE ─────────────────────────────────────────────────────────
+const ARC=188.5;
+function beginPause(title,sub,cb){
   inPause=true; pauseCb=cb; pauseLeft=cfg.pauseSec;
-  $('pov-title').textContent = title;
-  $('pov-sub').textContent   = sub;
+  $('pov-title').textContent=title; $('pov-sub').textContent=sub;
   $('pause-ov').classList.remove('hidden');
   $('play-ic').textContent='⏭'; $('play-lbl').textContent='Saltar';
-  tickPause();
-  pauseTimer=setInterval(tickPause,1000);
+  tickPause(); pauseTimer=setInterval(tickPause,1000);
 }
-
 function tickPause(){
-  $('pov-num').textContent = pauseLeft;
-  $('parc').setAttribute('stroke-dashoffset', ARC*(1-pauseLeft/cfg.pauseSec));
-  if(pauseLeft<=0){ endPause(); return; }
-  pauseLeft--;
+  $('pov-num').textContent=pauseLeft;
+  $('parc').setAttribute('stroke-dashoffset',ARC*(1-pauseLeft/cfg.pauseSec));
+  if(pauseLeft<=0){endPause();return;} pauseLeft--;
 }
-
 function endPause(){
-  clearInterval(pauseTimer); pauseTimer=null;
-  hidePauseOv();
-  inPause=false;
-  if(pauseCb){ const cb=pauseCb; pauseCb=null; cb(); }
+  clearInterval(pauseTimer); pauseTimer=null; hidePauseOv(); inPause=false;
+  if(pauseCb){const cb=pauseCb;pauseCb=null;cb();}
 }
+function skipPause(){pauseLeft=0;endPause();}
+function hidePauseOv(){$('pause-ov').classList.add('hidden');}
 
-function skipPause(){ pauseLeft=0; endPause(); }
-
-function hidePauseOv(){
-  $('pause-ov').classList.add('hidden');
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// SPEED IN READER
-// ─────────────────────────────────────────────────────────────────────────────
+// ── SPEED IN READER ───────────────────────────────────────────────
 function chgSpd(d){
-  cfg.ppm = Math.min(1000, Math.max(50, cfg.ppm+d));
-  if(cfg.mode==='libre' && passes[passIdx]) passes[passIdx].ppm = cfg.ppm;
-  const ppm = passes[passIdx] ? passes[passIdx].ppm : cfg.ppm;
-  $('r-ppm').textContent = ppm; $('r-lvl').textContent=lvl(ppm);
-  if(running){ clearTimeout(wordTimer); scheduleNextWord(); }
+  cfg.ppm=Math.min(1000,Math.max(50,cfg.ppm+d));
+  if(cfg.readMode==='libre'&&passes[passIdx])passes[passIdx].ppm=cfg.ppm;
+  const ppm=passes[passIdx]?passes[passIdx].ppm:cfg.ppm;
+  $('r-ppm').textContent=ppm; $('r-lvl').textContent=lvl(ppm);
+  if(running){clearTimeout(wordTimer);scheduleNext();}
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// RESTART
-// ─────────────────────────────────────────────────────────────────────────────
-function restartSession(){
+function restartReader(){
+  stopAll(); wordIdx=0; passIdx=0; blockIdx=0;
+  passes=passes.map(p=>({ppm:p.ppm,blocks:makeBlocks(p.ppm)}));
+  refreshPassDots(); showWord(); updateReaderUI(); setPlayUI(false);
+}
+
+function exitReader(){
   stopAll();
-  passIdx=0; blockIdx=0; wordIdx=0;
-  passes = passes.map((p,i)=>({ ppm:p.ppm, blocks:makeBlocks(p.ppm) }));
-  refreshPassDots();
-  showWord();
-  updateReaderUI();
-  setPlayUI(false);
+  showChapters();
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// DONE
-// ─────────────────────────────────────────────────────────────────────────────
+// ── DONE ─────────────────────────────────────────────────────────
 function showDone(){
-  const elapsed = Math.round((Date.now()-sessionStart)/1000);
-  const modeStr = cfg.mode==='libre' ? 'Lectura libre' :
-    ['','Con pausas','Over-speed ×2','Over-speed ×3'][cfg.trainMode]||'—';
-  $('d-words').textContent   = words.length;
-  $('d-mode').textContent    = modeStr;
-  $('d-ppm').textContent     = cfg.ppm+' ppm';
-  $('d-time').textContent    = fmt(elapsed);
-  $('d-passes').textContent  = passes.length+(passes.length>1?' pasadas':' pasada');
+  const elapsed=Math.round((Date.now()-sessionStart)/1000);
+  $('d-chapter').textContent=book.chapters[chapterIdx].title;
+  $('d-words').textContent=words.length.toLocaleString();
+  $('d-ppm').textContent=cfg.ppm+' ppm';
+  $('d-time').textContent=fmt(elapsed);
+  const hasNext=chapterIdx<book.chapters.length-1;
+  $('btn-next-ch').style.display=hasNext?'block':'none';
   showScreen('screen-done');
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+function nextChapter(){
+  if(chapterIdx<book.chapters.length-1){
+    selectChapter(chapterIdx+1);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SCREEN NAV
+// ═══════════════════════════════════════════════════════════════════
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $(id).classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // INIT
-// ─────────────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════
 $('row-pct3').style.display='none';
-updatePreviews();
-if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+$('train-panel').style.display='none';
+renderHome();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 const sp=new URLSearchParams(location.search);
 const st=sp.get('text')||sp.get('title');
-if(st){ pasteEl.value=st; pasteEl.dispatchEvent(new Event('input')); }
+if(st){
+  book={title:'Texto compartido',chapters:[{title:'Texto compartido',words:tokenize(st)}]};
+  openBook();
+}
 </script>
 </body>
 </html>
