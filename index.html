@@ -62,6 +62,23 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 .cfg-label{font-size:14px;color:var(--text)}
 .cfg-sub{font-size:11px;color:var(--muted);margin-top:1px}
 
+
+/* ── PASTE AREA ── */
+.paste-wrap{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden}
+.paste-area{width:100%;min-height:120px;padding:14px;font-size:16px;
+  color:var(--text);background:transparent;border:none;outline:none;
+  resize:none;font-family:inherit;line-height:1.5;
+  -webkit-user-select:text;user-select:text;display:block}
+.paste-area::placeholder{color:var(--muted)}
+.paste-footer{display:flex;align-items:center;justify-content:space-between;
+  padding:8px 12px;border-top:1px solid var(--border);background:var(--surface2)}
+.paste-count{font-size:12px;color:var(--muted)}
+.btn-paste-read{background:var(--accent);color:#111;border:none;
+  border-radius:8px;padding:8px 18px;font-size:14px;font-weight:700;cursor:pointer}
+.btn-paste-read:active{background:var(--accent-dk)}
+.btn-paste-read:disabled{background:var(--border);color:var(--muted)}
+
 /* ── HOME SCREEN ── */
 #screen-home{padding:0;overflow-y:auto}
 .home-header{padding:calc(var(--safe-top) + 16px) 18px 14px;
@@ -247,7 +264,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
     <button class="btn-settings" onclick="showSettings()" title="Ajustes">⚙️</button>
   </div>
   <div class="home-body">
-    <!-- Continue banner (hidden if no saved position) -->
+    <!-- Continue banner -->
     <div id="continue-banner" class="continue-banner" style="display:none" onclick="continueReading()">
       <div class="cb-icon">📖</div>
       <div class="cb-text">
@@ -257,8 +274,25 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
       <div class="cb-arrow">›</div>
     </div>
 
+    <!-- Paste area -->
     <div>
-      <div class="section-label">Cargar libro</div>
+      <div class="section-label">Pegar texto</div>
+      <div class="paste-wrap">
+        <textarea id="paste-input" class="paste-area"
+          placeholder="Pega aquí texto copiado de Safari, Notas, o cualquier app…"
+          oninput="onPasteInput(this.value)"></textarea>
+        <div class="paste-footer">
+          <span class="paste-count" id="paste-count"></span>
+          <button class="btn-paste-read" id="btn-paste-read" onclick="loadFromPaste()" disabled>
+            Leer →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- File loaders -->
+    <div>
+      <div class="section-label">O cargar fichero</div>
       <div class="load-grid">
         <button class="load-btn" onclick="document.getElementById('epub-input').click()">
           <span class="ic">📚</span><span class="lb">EPUB</span><span class="sb">libro digital</span>
@@ -1226,6 +1260,50 @@ function nextChapter(){
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   $(id).classList.add('active');
+}
+
+
+// ═══════════════════════════════════════════════════════════════════
+// PASTE HANDLER
+// ═══════════════════════════════════════════════════════════════════
+function onPasteInput(val){
+  const ws = tokenize(val);
+  const count = $('paste-count');
+  const btn   = $('btn-paste-read');
+  if(ws.length > 0){
+    count.textContent = ws.length.toLocaleString() + ' palabras';
+    btn.disabled = false;
+  } else {
+    count.textContent = '';
+    btn.disabled = true;
+  }
+}
+
+function loadFromPaste(){
+  const val = $('paste-input').value.trim();
+  if(!val) return;
+  const ws = tokenize(val);
+  if(!ws.length) return;
+  // Split into chunks of ~2500 words at sentence boundaries for chapter-like nav
+  const CHUNK = 2500;
+  const chapters = [];
+  let pos = 0, chNum = 1;
+  while(pos < ws.length){
+    let end = Math.min(pos + CHUNK, ws.length);
+    // Find sentence boundary
+    if(end < ws.length){
+      for(let i=end; i>=Math.max(pos, end-80); i--){
+        if(/[.!?]$/.test(ws[i])){end=i+1;break;}
+      }
+    }
+    chapters.push({ title: 'Parte ' + chNum, words: ws.slice(pos, end) });
+    pos = end; chNum++;
+  }
+  const title = 'Texto pegado ' + new Date().toLocaleDateString('es');
+  book = { title, chapters };
+  $('paste-input').value = '';
+  onPasteInput('');
+  openBook();
 }
 
 // ═══════════════════════════════════════════════════════════════════
