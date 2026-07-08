@@ -354,6 +354,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
         <button class="mode-tab" id="tab-train" onclick="setReadMode('train')">🏋 Entrenamiento</button>
       </div>
     </div>
+    <div>
+      <div class="section-label">Presentación</div>
+      <div class="mode-tabs">
+        <button class="mode-tab active" id="tab-standard" onclick="setGrouping(false)">Estándar</button>
+        <button class="mode-tab" id="tab-grouping" onclick="setGrouping(true)">🔗 Agrupación inteligente</button>
+      </div>
+      <div class="sess-est" style="margin-top:6px">Palabras de menos de 3 letras (el, y, de…) se muestran junto a la siguiente</div>
+    </div>
     <div class="card">
       <div class="cfg-row">
         <div><div class="cfg-label">Micro-pausas en puntuación</div>
@@ -574,7 +582,7 @@ let sessionStart=0;
 
 const cfg = {
   ppm:250, readMode:'libre', trainMode:1,
-  blockMin:2.0, pauseSec:25, pct2:30, pct3:50, microPauses:true
+  blockMin:2.0, pauseSec:25, pct2:30, pct3:50, microPauses:true, grouping:false
 };
 
 // ═══════════════════════════════════════════════════════════════════
@@ -601,6 +609,27 @@ function wordDelay(w,ppm){
   if(/[.!?]['"»)\]]*$/.test(w))return b*2.5;
   if(/[,;:]['"»)\]]*$/.test(w))return b*1.5;
   return b;
+}
+function isShortTok(w){
+  const c=w.replace(/[^a-záéíóúüñA-ZÁÉÍÓÚÜÑ]/g,'');
+  return c.length>0 && c.length<3;
+}
+function endsClause(w){
+  return /[.,;:!?…"'»)\]]$/.test(w);
+}
+// Returns the range of word indices to show together: a pair when the
+// leading word is a short connector (<3 letters) that doesn't end a
+// clause, otherwise a single word.
+function getUnit(idx){
+  if(cfg.grouping && isShortTok(words[idx]) && !endsClause(words[idx]) && idx+1<words.length){
+    return {start:idx, end:idx+2};
+  }
+  return {start:idx, end:idx+1};
+}
+function unitDelay(unit,ppm){
+  if(unit.end-unit.start===1)return wordDelay(words[unit.start],ppm);
+  // Short connector "costs" half a normal slot since it barely needs fixation.
+  return wordDelay(words[unit.start],ppm)*0.5 + wordDelay(words[unit.start+1],ppm);
 }
 function sentBoundary(idx){
   for(let i=Math.min(idx,words.length-1);i>=Math.max(0,idx-60);i--)
@@ -1040,6 +1069,11 @@ function setReadMode(m){
   $('train-panel').style.display=m==='train'?'flex':'none';
   updatePreviews();
 }
+function setGrouping(v){
+  cfg.grouping=v;
+  $('tab-standard').classList.toggle('active',!v);
+  $('tab-grouping').classList.toggle('active',v);
+}
 function setTrainMode(n){
   cfg.trainMode=n;
   document.querySelectorAll('.train-opt').forEach(el=>{
@@ -1122,13 +1156,20 @@ function showWord(){
     $('orp-top').style.opacity=$('orp-bot').style.opacity='0';
     return;
   }
-  const w=words[wordIdx], o=orp(w);
+  const unit=getUnit(wordIdx);
+  let txt,o;
+  if(unit.end-unit.start===2){
+    const prefix=words[unit.start], main=words[unit.start+1];
+    txt=prefix+' '+main; o=prefix.length+1+orp(main);
+  } else {
+    txt=words[unit.start]; o=orp(txt);
+  }
   $('word-disp').innerHTML=
-    '<span>'+w.slice(0,o)+'</span>'+
-    '<span class="word-pivot">'+w.slice(o,o+1)+'</span>'+
-    '<span>'+w.slice(o+1)+'</span>';
+    '<span>'+txt.slice(0,o)+'</span>'+
+    '<span class="word-pivot">'+txt.slice(o,o+1)+'</span>'+
+    '<span>'+txt.slice(o+1)+'</span>';
   const bw=$('word-box').offsetWidth, cw=22;
-  const sx=(bw-w.length*cw)/2, px=Math.round((sx+o*cw+cw/2)/bw*100);
+  const sx=(bw-txt.length*cw)/2, px=Math.round((sx+o*cw+cw/2)/bw*100);
   [$('orp-top'),$('orp-bot')].forEach(el=>{
     el.style.left=px+'%'; el.style.transform='translateX(-50%)'; el.style.opacity='1';
   });
@@ -1140,11 +1181,12 @@ function showWord(){
 // ── PLAY ENGINE ───────────────────────────────────────────────────
 function scheduleNext(){
   if(!running)return;
-  const w=words[wordIdx]||'', ppm=passes[passIdx].ppm;
-  const delay=wordDelay(w,ppm);
+  const ppm=passes[passIdx].ppm;
+  const unit=getUnit(wordIdx);
+  const delay=unitDelay(unit,ppm);
   wordTimer=setTimeout(()=>{
     if(!running)return;
-    wordIdx++;
+    wordIdx=unit.end;
     if(wordIdx>=words.length){onPassEnd();return;}
     const blk=passes[passIdx].blocks[blockIdx];
     if(blk&&wordIdx>=blk.end){

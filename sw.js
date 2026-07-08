@@ -1,4 +1,4 @@
-const CACHE = "rsvp-v1";
+const CACHE = "rsvp-v2";
 const ASSETS = ["./", "./index.html"];
 
 self.addEventListener("install", e => {
